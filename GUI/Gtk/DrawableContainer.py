@@ -49,7 +49,8 @@ class DrawableContainer(GDrawableContainer):
     
     def update(self):
         gdk_window = self._gtk_inner_widget.bin_window
-        gdk_window.process_updates()
+        if gdk_window:
+            gdk_window.process_updates(True)
 
     #
     #		Internal
