@@ -4,9 +4,13 @@
 
 import sys
 import gtk
+import gobject
+
 from GUI import export
 from GUI import application
 from GUI.GApplications import Application as GApplication
+
+gobject.threads_init()
 
 class Application(GApplication):
 
@@ -53,7 +57,13 @@ class Application(GApplication):
     
     def set_clipboard(self, data):
         _gtk_clipboard.set(data)
+        
+    def schedule_idle(self, callback, *args):
+        gobject.idle_add(callback, *args)
 
+    def schedule_timeout(self, interval, callback, *args):
+        gobject.timeout_add(interval, callback, *args)
+        
 #------------------------------------------------------------------------------
 
 class GtkClipboard(gtk.Window):

@@ -545,3 +545,9 @@ class Application(Properties, MessageHandler):
         The default action is to close the application; subclasses may override
         it to take some other action, such as creating a new window."""
         self.quit_cmd()
+
+    def schedule(self, callback, *args):
+        callback(*args)
+    
+    def schedule_timeout(self, interval, callback, *args):
+        calback(*args)
