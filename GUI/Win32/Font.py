@@ -53,11 +53,14 @@ win_generic_family_map = {
 #  PyWin32 build 212 and earlier negate the value of the height
 #  passed to CreateFont.
 
-pywin32_info = api.GetFileVersionInfo(api.__file__, '\\')
-pywin32_build = pywin32_info['FileVersionLS'] >> 16
-if pywin32_build <= 212:
-    win_height_sign = 1
-else:
+try:
+    pywin32_info = api.GetFileVersionInfo(api.__file__, '\\')
+    pywin32_build = pywin32_info['FileVersionLS'] >> 16
+    if pywin32_build <= 212:
+        win_height_sign = 1
+    else:
+        win_height_sign = -1
+except:
     win_height_sign = -1
 
 #--------------------------------------------------------------------

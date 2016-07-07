@@ -546,7 +546,7 @@ class Application(Properties, MessageHandler):
         it to take some other action, such as creating a new window."""
         self.quit_cmd()
 
-    def schedule(self, callback, *args):
+    def schedule_idle(self, callback, *args):
         callback(*args)
     
     def schedule_timeout(self, interval, callback, *args):
