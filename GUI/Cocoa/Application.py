@@ -143,8 +143,12 @@ class Application(GApplication):
         try:
             GApplication.run(self)
         except (KeyboardInterrupt, SystemExit):
+            import logging
+            logging.getLogger('pygui').exception('failed interrupt')
             pass
         except:
+            import logging
+            logging.getLogger('pygui').exception('failed unexpected exception')
             traceback.print_exc()
         #  A py2app bundled application seems to crash on exit if we don't
         #  bail out really quickly here (Python 2.3, PyObjC 1.3.7, py2app 0.2.1,
