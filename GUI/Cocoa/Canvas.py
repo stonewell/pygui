@@ -194,7 +194,7 @@ class Canvas(GCanvas):
         dy = h - d
         if ns_font.familyName() == "Courier New":
             dy += ns_font.pointSize() * 0.229167
-        ns_point = NSPoint(x, y - dy)
+        ns_point = NSPoint(x, y - h)
         #print "drawing at:", ns_point ###
         ns_string.drawAtPoint_withAttributes_(ns_point, ns_attrs)
         dx = ns_font.widthOfString_(ns_string)
