@@ -404,9 +404,15 @@ class Graphics(object):
     
     def FillPath(self, brush, path):
         wg.GdipFillPath(self.ptr, brush.ptr, path.ptr)
-    
+
+    def __to_unicode(self, text):
+        try:
+            return unicode(text)
+        except:
+            return text
+        
     def DrawAndMeasureStringWidth_2f(self, text, font, x, y, brush):
-        wtext = unicode(text)
+        wtext = self.__to_unicode(text)
         n = len(text)
         pos = PointF(x, y)
         flags = 5 # DriverStringOptions CmapLookup+RealizedAdvance
@@ -418,7 +424,7 @@ class Graphics(object):
         return b.width
     
     def MeasureStringWidth(self, text, font):
-        wtext = unicode(text)
+        wtext = self.__to_unicode(text)
         n = len(text)
         pos = PointF(0, 0)
         flags = 5 # DriverStringOptions CmapLookup+RealizedAdvance
