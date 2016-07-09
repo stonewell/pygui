@@ -73,7 +73,6 @@ _ns_keycode_to_keyname = {
     #AppKit.NSHelpFunctionKey: 'help',
     AppKit.NSHelpFunctionKey: 'insert',
     "\r": 'return',
-    "\x03": 'enter',
 }
 
 _mouse_events = [
