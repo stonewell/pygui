@@ -44,7 +44,7 @@ _gdk_keyval_to_keyname = {
     0xFF56: 'page_down',
     0xFF57: 'end',
     #0xFF6A: 'help',
-    0xFF6A: 'insert',
+    0xFF63: 'insert',
     0xFF0D: 'return',
     0xFF8D: 'enter',
     0xFFBE: 'f1',
@@ -94,7 +94,7 @@ class Event(GEvent):
         event._set_from_gtk_event(gtk_event)
         keyval = gtk_event.keyval
         event._keycode = keyval
-        #print "Event._from_gtk_key_event: keyval = 0x%04X" % keyval ###
+        ##print "Event._from_gtk_key_event: keyval = 0x%04X" % keyval ###
         key = _gdk_keyval_to_keyname.get(keyval, "")
         if keyval == 0xFFFF: # GDK_Delete
             char = "\x7F"
