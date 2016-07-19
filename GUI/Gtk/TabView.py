@@ -50,7 +50,7 @@ class TabView(GTabView):
         _gtk_notebook.remove_page(i)
 
     def _gtk_notebook_switch_page_signal(self, page, page_num, *largs):
-        GTabView.tab_changed(page_num)
+        GTabView.tab_changed(self, page_num)
         
 export(TabView)
 

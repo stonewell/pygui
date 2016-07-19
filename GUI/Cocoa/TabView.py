@@ -76,7 +76,7 @@ class TabView(GTabView):
         _ns_tabview.removeTabViewItem_(_ns_tabview.tabViewItems()[i])
 
     def tabView_didSelectTabViewItem_(self, tabview, item):
-        GTabView.tab_changed(tabview.indexOfTabViewItem_(item))
+        GTabView.tab_changed(self, tabview.indexOfTabViewItem_(item))
         
 #------------------------------------------------------------------------------
 
