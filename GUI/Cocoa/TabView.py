@@ -25,6 +25,8 @@ class TabView(GTabView):
         ns_tabview = PyGUI_NSTabView.alloc().init()
         ns_tabview.pygui_component = self
         ns_tabview.setFont_(font._ns_font)
+        ns_tabview.setDelegate_(self)
+        
         return ns_tabview
 
     def __init__(self, font = system_font, **kwds):
@@ -72,7 +74,9 @@ class TabView(GTabView):
             return
 
         _ns_tabview.removeTabViewItem_(_ns_tabview.tabViewItems()[i])
-        
+
+    def tabView_didSelectTabViewItem_(self, tabview, item):
+        GTabView.tab_changed(tabview.indexOfTabViewItem_(item))
         
 #------------------------------------------------------------------------------
 
