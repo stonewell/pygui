@@ -13,6 +13,9 @@ class TabView(Component):
         "selected tab item")
     items = overridable_property('items', "tab view items")
 
+    def __init__(self, **kwargs):
+        Component.__init__(self, **kwargs)
+        
     def add_item(self, v, title = None):
         pass
 
@@ -25,3 +28,5 @@ class TabView(Component):
     def remove_item_at(self, i):
         pass
 
+    def tab_changed(self, tab_index):
+        pass

@@ -26,10 +26,10 @@ class TabViewPyGUIApp(Application):
         win = Window(size = (600, 400), document = document)
 
         self.view1 = Button(title='Item 1', action=self.item1Action)
-        view.add_item(self.view1)
+        view.add_item(self.view1, title='asdfe')
 
         self.view2 = Button(title='Item 2', action=self.item2Action)
-        view.add_item(self.view2)
+        view.add_item(self.view2, title="Two")
 
         win.place(view, left = 0, top = 0, right = 0, bottom = 0, sticky = 'nsew')
 
