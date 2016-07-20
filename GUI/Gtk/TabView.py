@@ -20,6 +20,7 @@ class TabView(GTabView):
             **kwds)
     
     def add_item(self, v, title = None):
+        GTabView.add_item(self, v, title)
         _gtk_notebook = self._gtk_inner_widget
 
         _tab_label = None
@@ -31,6 +32,7 @@ class TabView(GTabView):
         _gtk_notebook.append_page(v._gtk_inner_widget, tab_label = _tab_label)
 
     def remove_item(self, v):
+        GTabView.remove_item(self, v)
         _gtk_notebook = self._gtk_inner_widget
 
         page_num = _gtk_notebook.page_num(v._gtk_inner_widget)
@@ -39,6 +41,7 @@ class TabView(GTabView):
             _gtk_notebook.remove_page(page_num)
 
     def insert_item_at(self, v, i, title = None):
+        GTabView.insert_item_at(self, v, i, title)
         _gtk_notebook = self._gtk_inner_widget
         _tab_label = None
         if title:
@@ -47,12 +50,13 @@ class TabView(GTabView):
         _gtk_notebook.insert_page(v._gtk_inner_widget, tab_label=_tab_label, position=i)
 
     def remove_item_at(self, i):
+        GTabView.remove_item_at(self, i)
         _gtk_notebook = self._gtk_inner_widget
 
         _gtk_notebook.remove_page(i)
 
     def _gtk_notebook_switch_page_signal(self, page, page_num, *largs):
         self.tab_changed(page_num)
-        
+
 export(TabView)
 
