@@ -25,7 +25,9 @@ class TabView(GTabView):
         _tab_label = None
         if title:
             _tab_label = gtk.Label(title)
+            _tab_label.show()
 
+        v._gtk_inner_widget.show()
         _gtk_notebook.append_page(v._gtk_inner_widget, tab_label = _tab_label)
 
     def remove_item(self, v):
@@ -50,7 +52,7 @@ class TabView(GTabView):
         _gtk_notebook.remove_page(i)
 
     def _gtk_notebook_switch_page_signal(self, page, page_num, *largs):
-        GTabView.tab_changed(page_num)
+        self.tab_changed(page_num)
         
 export(TabView)
 

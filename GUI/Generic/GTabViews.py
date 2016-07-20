@@ -15,18 +15,23 @@ class TabView(Component):
 
     def __init__(self, **kwargs):
         Component.__init__(self, **kwargs)
+
+        self._items = []
         
     def add_item(self, v, title = None):
-        pass
+        self._items.append(v)
 
     def remove_item(self, v):
-        pass
+        self._items.remove(v)
 
     def insert_item_at(self, v, i, title = None):
-        pass
+        self._items.insert(i, v)
 
     def remove_item_at(self, i):
-        pass
+        self._items.remove(self._items[i])
 
     def tab_changed(self, tab_index):
         pass
+
+    def get_items(self):
+        return self._items
