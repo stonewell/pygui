@@ -6,7 +6,6 @@ import sys
 import gtk
 from gtk import gdk
 from GUI import export
-from GUI import export
 from GUI.GGeometry import sub_pt
 from GUI import Component
 from GUI import Container

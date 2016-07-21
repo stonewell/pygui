@@ -45,6 +45,8 @@ class TabView(GTabView):
         return _ns_tabview_item
         
     def add_item(self, v, title = None):
+        GTabView.add_item(self, v, title)
+        
         _ns_tabview = self._ns_view
 
         _ns_tabview_item = self._create_ns_tabview_item(v, title)
@@ -52,6 +54,8 @@ class TabView(GTabView):
         _ns_tabview.addTabViewItem_(_ns_tabview_item)
 
     def remove_item(self, v):
+        GTabView.remove_item(self, v)
+        
         _ns_tabview = self._ns_view
         for item in _ns_tabview.tabViewItems():
             if item.view() == v._ns_view:
@@ -59,6 +63,8 @@ class TabView(GTabView):
                 break
 
     def insert_item_at(self, v, i, title = None):
+        GTabView.insert_item_at(self, v, i, title)
+        
         _ns_tabview = self._ns_view
 
         _ns_tabview_item = self._create_ns_tabview_item(v, title)
@@ -66,6 +72,8 @@ class TabView(GTabView):
         _ns_tabview.insertTabViewItem_atIndex_(_ns_tabview_item, i)
 
     def remove_item_at(self, i):
+        GTabView.remove_item_at(self, i)
+
         _ns_tabview = self._ns_view
 
         count = _ns_tabview.numberOfTabViewItems()
@@ -76,7 +84,25 @@ class TabView(GTabView):
         _ns_tabview.removeTabViewItem_(_ns_tabview.tabViewItems()[i])
 
     def tabView_didSelectTabViewItem_(self, tabview, item):
-        GTabView.tab_changed(self, tabview.indexOfTabViewItem_(item))
+        self.tab_changed(tabview.indexOfTabViewItem_(item))
+        
+    def get_selected_index(self):
+        _ns_tabview = self._ns_view
+
+        item = _ns_tabview.selectedTabViewItem()
+
+        if item:
+            return _ns_tabview.indexOfTabViewItem_(item)
+
+        return -1
+
+    def set_selected_index(self, index):
+        _ns_tabview = self._ns_view
+
+        if index < 0:
+            _nstabview.selectTabViewItem_(None)
+        else:
+            _ns_tabview.selectTabViewItemAtIndex_(index)
         
 #------------------------------------------------------------------------------
 

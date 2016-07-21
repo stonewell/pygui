@@ -51,6 +51,9 @@ class DrawableContainer(GDrawableContainer):
         gdk_window = self._gtk_inner_widget.bin_window
         if gdk_window:
             gdk_window.process_updates(True)
+        # BUG, notebook may block expose event, Force self to redraw, 
+        _drawable = self._gtk_inner_widget
+        _drawable.queue_draw()
 
     #
     #		Internal
