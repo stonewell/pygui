@@ -35,3 +35,10 @@ class TabView(Component):
 
     def get_items(self):
         return self._items
+
+    def get_selected_index(self):
+        raise NotImplementedError
+
+    def set_selected_index(self, index):
+        raise NotImplementedError
+    

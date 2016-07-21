@@ -58,5 +58,15 @@ class TabView(GTabView):
     def _gtk_notebook_switch_page_signal(self, page, page_num, *largs):
         self.tab_changed(page_num)
 
+    def get_selected_index(self):
+        _gtk_notebook = self._gtk_inner_widget
+
+        return _gtk_notebook.get_current_page()
+
+    def set_selected_index(self, index):
+        _gtk_notebook = self._gtk_inner_widget
+
+        _gtk_notebook.set_current_page(index)
+        
 export(TabView)
 

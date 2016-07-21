@@ -86,6 +86,24 @@ class TabView(GTabView):
     def tabView_didSelectTabViewItem_(self, tabview, item):
         self.tab_changed(tabview.indexOfTabViewItem_(item))
         
+    def get_selected_index(self):
+        _ns_tabview = self._ns_view
+
+        item = _ns_tabview.selectedTabViewItem()
+
+        if item:
+            return _ns_tabview.indexOfTabViewItem_(item)
+
+        return -1
+
+    def set_selected_index(self, index):
+        _ns_tabview = self._ns_view
+
+        if index < 0:
+            _nstabview.selectTabViewItem_(None)
+        else:
+            _ns_tabview.selectTabViewItemAtIndex_(index)
+        
 #------------------------------------------------------------------------------
 
 class PyGUI_NSTabView(NSTabView, PyGUI_NS_EventHandler):
