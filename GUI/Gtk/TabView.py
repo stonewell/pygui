@@ -18,7 +18,7 @@ class TabView(GTabView):
         self._gtk_connect(gtk_notebook, 'switch-page', self._gtk_notebook_switch_page_signal)
         GTabView.__init__(self, _gtk_outer = gtk_notebook,
             **kwds)
-    
+
     def add_item(self, v, title = None):
         GTabView.add_item(self, v, title)
         _gtk_notebook = self._gtk_inner_widget
@@ -28,8 +28,7 @@ class TabView(GTabView):
             _tab_label = gtk.Label(title)
             _tab_label.show()
 
-        v._gtk_inner_widget.show()
-        _gtk_notebook.append_page(v._gtk_inner_widget, tab_label = _tab_label)
+        index = _gtk_notebook.append_page(v._gtk_inner_widget, tab_label = _tab_label)
 
     def remove_item(self, v):
         GTabView.remove_item(self, v)
@@ -67,6 +66,5 @@ class TabView(GTabView):
         _gtk_notebook = self._gtk_inner_widget
 
         _gtk_notebook.set_current_page(index)
-        
-export(TabView)
 
+export(TabView)

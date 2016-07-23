@@ -37,9 +37,9 @@ class Component(GComponent):
                 return component
             gtk_widget = gtk_widget.get_parent()
         return None
-    
+
     _gtk_find_component = staticmethod(_gtk_find_component)
-    
+
     def __init__(self, _gtk_outer, _gtk_inner = None,
             _gtk_focus = None, _gtk_input = None, **kwds):
         self._position = (0, 0)
@@ -53,14 +53,16 @@ class Component(GComponent):
         if _gtk_focus:
             _gtk_focus.set_property('can-focus', True)
             self._gtk_connect(_gtk_focus, 'focus-in-event', self._gtk_focus_in)
+        self._gtk_connect(self._gtk_outer_widget, 'size-allocate', self._gtk_size_allocate)
+
         GComponent.__init__(self, **kwds)
-    
+
     def destroy(self):
         gtk_widget = self._gtk_outer_widget
         if gtk_widget in _gtk_widget_to_component:
             del _gtk_widget_to_component[gtk_widget]
         GComponent.destroy(self)
-    
+
     #
     #		Properties
     #
@@ -80,9 +82,9 @@ class Component(GComponent):
         self._position = v
         widget = self._gtk_outer_widget
         parent = widget.get_parent()
-        if parent:
+        if parent and hasattr(parent, 'move'):
             parent.move(widget, *v)
-        
+
     def get_size(self):
         return self._size
 
@@ -93,7 +95,7 @@ class Component(GComponent):
         self._size = new_size
         if w0 != w1 or h0 != h1:
             self._resized((w1 - w0, h1 - h0))
-    
+
     def get_bounds(self):
         x, y = self._position
         w, h = self.size
@@ -105,10 +107,10 @@ class Component(GComponent):
 
 #	def get_visible(self):
 #		return self._gtk_outer_widget.get_property('visible')
-#	
+#
 #	def set_visible(self, v):
 #		self._gtk_outer_widget.set_property('visible', v)
-    
+
     #
     #   Message dispatching
     #
@@ -138,11 +140,11 @@ class Component(GComponent):
             return gtk_focus.get_property('has-focus')
         else:
             return False
-    
+
     #
     #   Internal
     #
-    
+
     def _gtk_connect(self, gtk_widget, signal, handler):
         def catch(widget, *args):
             try:
@@ -170,10 +172,10 @@ class Component(GComponent):
 
     def _targeted(self):
         pass
-    
+
     def _untargeted(self):
         pass
-    
+
     def _gtk_connect_input_events(self, gtk_widget):
         self._last_mouse_down_time = 0
         self._click_count = 0
@@ -209,7 +211,7 @@ class Component(GComponent):
             #print "Component._gtk_button_press_event_signal:" ###
             #print event ###
             return self._event_custom_handled(event)
-    
+
     def _gtk_motion_notify_event_signal(self, gtk_event):
         event = Event._from_gtk_mouse_event(gtk_event)
         self._mouse_event = event
@@ -242,6 +244,20 @@ class Component(GComponent):
             #if event.kind == 'key_down': ###
             #	print event ###
             return self._event_custom_handled(event)
+
+    def _gtk_size_allocate(self, allocation, *largs):
+        x, y, w, h = allocation
+
+        x0, y0 = self.position
+        w0, h0 = self.size
+
+        if x0 != x or y0 != y:
+            self._position = (x, y)
+
+        if w0 != w or h0 != h:
+            self._size = (w, h)
+            self._resized((w - w0, h - h0))
+
 
 #------------------------------------------------------------------------------
 
