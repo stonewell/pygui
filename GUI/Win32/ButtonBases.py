@@ -4,6 +4,8 @@
 #
 #--------------------------------------------------------------------
 
+from GUI.GControls import Control as GControl
+
 class ButtonBase(object):
 
     def key_down(self, event):

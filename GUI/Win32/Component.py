@@ -4,7 +4,10 @@
 #
 #--------------------------------------------------------------------
 
+import struct
+
 import win32con as wc, win32ui as ui, win32gui as gui, win32api as api
+import win32gui_struct
 
 from GUI import export
 from GUI.Geometry import sub_pt
@@ -50,7 +53,7 @@ class Component(GComponent):
     _win_hooks_events = False
     _win_transparent = False
     _win_captures_mouse = False
-    
+
     _h_scroll_offset = 0
     _v_scroll_offset = 0
     _win_tracking_mouse = False
@@ -63,7 +66,7 @@ class Component(GComponent):
         _win.AttachObject(self)
         self._win_install_event_hooks()
         GComponent.__init__(self, **kwds)
-    
+
     def destroy(self):
         GComponent.destroy(self)
         wo = self._win
@@ -72,24 +75,24 @@ class Component(GComponent):
             wo.ShowWindow(wc.SW_HIDE)
             application()._win_recycle(wo)
             #self._win = None
-    
+
     def _win_get_flag(self, flag):
         return self._win.GetStyle() & flag != 0
-    
+
     def _win_set_flag(self, b, flag, swp_flags = 0):
         if b:
             state = flag
         else:
             state = 0
         self._win.ModifyStyle(flag, state, swp_flags)
-    
+
     def _win_set_ex_flag(self, b, flag, swp_flags = 0):
         if b:
             state = flag
         else:
             state = 0
         self._win.ModifyStyleEx(flag, state, swp_flags)
-    
+
     def _change_container(self, new_container):
         GComponent._change_container(self, new_container)
         if new_container:
@@ -100,7 +103,7 @@ class Component(GComponent):
         gui.SetParent(hwnd, win_new_parent.GetSafeHwnd())
         if new_container:
             self._win_move_window(self._bounds)
-    
+
     def _win_install_event_hooks(self):
         def hook(message):
             return self._win_event_message(message)
@@ -109,26 +112,37 @@ class Component(GComponent):
             win.HookMessage(hook, msg)
         win.HookMessage(self._win_wm_setfocus, wc.WM_SETFOCUS)
         win.HookMessage(self._win_wm_killfocus, wc.WM_KILLFOCUS)
-    
+        win.HookMessage(self._win_wm_notify, wc.WM_NOTIFY)
+
+    def _win_wm_notify(self, message):
+        lParam = message[3]
+
+        info = win32gui_struct.UnpackNMITEMACTIVATE(lParam)
+
+        _forward = getattr(self, '_forward_reflected_message', None)
+
+        if _forward:
+            _forward(info.hwndFrom, '_win_wm_notify', info)
+
     def _win_wm_setfocus(self, msg):
         #print "Component._win_wm_setfocus:", self ###
         self.targeted()
         return True
-    
+
     def targeted(self):
         pass
-    
+
     def _win_wm_killfocus(self, msg):
         #print "Component._win_wm_killfocus:", self ###
         self.untargeted()
         return True
-    
+
     def untargeted(self):
         pass
-    
+
     def _win_on_ctlcolor(self, dc, typ):
         pass
-    
+
 #	def OnCtlColor(self, dc, comp, typ):
 #		#print "Component.OnCtlColor" ###
 #		meth = getattr(comp, '_win_on_ctlcolor', None)
@@ -137,11 +151,11 @@ class Component(GComponent):
 
     def get_bounds(self):
         return self._bounds
-    
+
     def set_bounds(self, rect):
         self._win_move_window(rect)
         self._win_change_bounds(rect)
-    
+
     def _win_change_bounds(self, rect):
         l0, t0, r0, b0 = self._bounds
         l1, t1, r1, b1 = rect
@@ -152,17 +166,17 @@ class Component(GComponent):
         self._bounds = rect
         if w0 != w1 or h0 != h1:
             self._resized((w1 - w0, h1 - h0))
-    
+
     def _win_move_window(self, bounds):
         container = self.container
         if container:
             rect = container._win_adjust_bounds(bounds)
             self._win.MoveWindow(rect)
-    
+
     def _win_adjust_bounds(self, bounds):
         #  Scrollable views override this to adjust for the scroll offset.
         return bounds
-    
+
     def _win_get_actual_bounds(self):
         win = self._win
         parent = win.GetParent()
@@ -170,7 +184,7 @@ class Component(GComponent):
         return parent._win.ScreenToClient(sbounds)
 
     def become_target(self):
-        #print "Component.become_target:", self ###
+        #print "Component.become_target:", self, self.window ###
         window = self.window
         if window:
             if window._win_is_active():
@@ -179,7 +193,7 @@ class Component(GComponent):
             else:
                 #print "...saving focus in", window ###
                 window._win_saved_target = self
-    
+
     def invalidate_rect(self, r):
         #print "Component.invalidate_rect:", self, r ###
         self._invalidate_rect(r)
@@ -187,19 +201,19 @@ class Component(GComponent):
             cont = self.container
             if cont:
                 cont.invalidate_rect(self.local_to_container(r))
-    
+
     def _invalidate_rect(self, r):
         self._win.InvalidateRect(r)
 
     def local_to_global(self, p):
         return self._win.ClientToScreen(p)
-    
+
     def global_to_local(self, p):
         return self._win.ScreenToClient(p)
-    
+
     def container_to_local(self, p):
         return transform_coords(self.container, self, p)
-    
+
     def local_to_container(self, p):
         return transform_coords(self, self.container, p)
 
@@ -210,7 +224,7 @@ class Component(GComponent):
                 print "Component._win_event_message: %s 0x%08x 0x%08x" % ( ###
                     win_message_name(message[1]),
                     message[2] & 0xffffffff,
-                    message[3] & 0xffffffff) ###
+                    message[3] & 0xffffffff), self ###
             event = win_message_to_event(message, self)
             kind = event.kind
             if kind.startswith('key') and message[2] in win_virt_modifiers:

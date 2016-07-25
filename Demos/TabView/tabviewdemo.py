@@ -51,3 +51,4 @@ class TabViewPyGUIApp(Application):
         
 if __name__ == '__main__':
     TabViewPyGUIApp().run()
+    os._exit(0)

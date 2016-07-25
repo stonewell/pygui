@@ -144,8 +144,9 @@ class Font(GFont):
         self._leading = met['tmExternalLeading']
         self._win_overhang = met['tmOverhang']
         #print "Font: tmOverhang =", self._win_overhang ###
-        win_none.ReleaseDC(dc)
         self._win_gdip_font = gdip.Font(self._win_family, self._size, self._style)
+        #self._win_gdip_font = gdip.Font.from_hdc(dc.GetSafeHdc())
+        win_none.ReleaseDC(dc)
     
     ## def _width(self, s):
     ##     dc = win_none.GetDC()
