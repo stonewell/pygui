@@ -86,6 +86,8 @@ class Font(GFont):
             name = win_family,
             height = win_height_sign * height,
             weight = win_weight,
+            quality = wc.ANTIALIASED_QUALITY,
+            #quality = wc.CLEARTYPE_QUALITY,
             italic = 'italic' in style)
             #pitch_and_family = 0) ###win_family_map.get(family, win_default_pf))
         self._win_font = win_font
@@ -95,7 +97,7 @@ class Font(GFont):
         #dc.SelectObject(win_font)
         #self._win_gfont = gdip.Font.from_hdc(dc.GetSafeHdc())
         #win_none.ReleaseDC(dc)
-    
+
 #	def __init__(self, family = "Times", size = 12, style = []):
 #		self._family = family
 #		self._size = size
@@ -112,28 +114,28 @@ class Font(GFont):
 
     def get_style(self):
         return self._style
-    
+
     def get_ascent(self):
         return self._ascent
-    
+
     def get_descent(self):
         return self._descent
-    
+
     def get_leading(self):
         return self._leading
-    
+
     def get_cap_height(self):
         return self._ascent - self._internal_leading
-    
+
     def get_x_height(self):
         return self._ascent - self._internal_leading - self._descent
-    
+
     def get_height(self):
         return self._ascent + self._descent
-    
+
     def get_line_height(self):
         return self._ascent + self._descent + self._leading
-    
+
     def _win_update_metrics(self):
         dc = win_none.GetDC()
         dc.SelectObject(self._win_font)
@@ -144,32 +146,51 @@ class Font(GFont):
         self._leading = met['tmExternalLeading']
         self._win_overhang = met['tmOverhang']
         #print "Font: tmOverhang =", self._win_overhang ###
+
+        logfont = gui.LOGFONT()
+        logfont.lfHeight = win_height_sign * int(round(self._size))
+        logfont.lfWidth = wc.FW_BOLD if 'bold' in self._style else wc.FW_NORMAL
+        logfont.lfEscapement = 0
+        logfont.lfOrientation = 0
+        logfont.lfWeight = 0
+        logfont.lfItalic = 1 if 'italic' in self._style else 0
+        logfont.lfUnderline = 1 if 'underline' in self._style else 0
+        logfont.lfStrikeOut = 1 if 'strikeout' in self._style else 0
+        logfont.lfCharSet = wc.DEFAULT_CHARSET
+        logfont.lfOutPrecision = 0
+        logfont.lfClipPrecision = 0
+        logfont.lfQuality = wc.CLEARTYPE_QUALITY
+        logfont.lfPitchAndFamily = 0
+        logfont.lfFaceName = self._win_family
+
         self._win_gdip_font = gdip.Font(self._win_family, self._size, self._style)
+        #self._win_gdip_font = gdip.Font.from_logfont(dc.GetSafeHdc(), logfont)
         #self._win_gdip_font = gdip.Font.from_hdc(dc.GetSafeHdc())
         win_none.ReleaseDC(dc)
-    
+
+    def _width(self, s):
+        dc = win_none.GetDC()
+        dc.SelectObject(self._win_font)
+        #w, h = dc.GetTextExtent(s)
+        w, h = gui.GetTextExtentPoint32(dc.GetSafeHdc(), s)
+        win_none.ReleaseDC(dc)
+        return w
+
     ## def _width(self, s):
     ##     dc = win_none.GetDC()
     ##     dc.SelectObject(self._win_font)
-    ##     #w, h = dc.GetTextExtent(s)
-    ##     w, h = gui.GetTextExtentPoint32(dc.GetSafeHdc(), s)
+    ##     g = gdip.Graphics.from_hdc(dc.GetSafeHdc())
+    ##     w = g.MeasureStringWidth(s, self._win_gdip_font)
     ##     win_none.ReleaseDC(dc)
     ##     return w
-    
-    def _width(self, s):
-        dc = win_none.GetDC()
-        g = gdip.Graphics.from_hdc(dc.GetSafeHdc())
-        w = g.MeasureStringWidth(s, self._win_gdip_font)
-        win_none.ReleaseDC(dc)
-        return w
 
     def info(self):
         return "<Font family=%r size=%s style=%s ascent=%s descent=%s " \
             "leading=%s height=%s cap_height=%s x_height=%s line_height=%s>" % \
-            (self.family, self.size, self.style, self.ascent, self.descent, 
+            (self.family, self.size, self.style, self.ascent, self.descent,
             self.leading, self.height, self.cap_height, self.x_height,
             self.line_height)
-    
+
     def tm_info(self):
         win = ui.CreateWnd()
         dc = win.GetDC()

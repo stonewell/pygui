@@ -51,40 +51,48 @@ class Canvas(GCanvas):
 
     _current_point = None
     
-#	def __init__(self, win_graphics, dc = None):
-#		if not dc:
-#			print "Canvas.__init__: before get dc: clip bounds =", win_graphics.GetClipBounds() ###
-#			dc = ui.CreateDCFromHandle(win_graphics.GetHDC())
-#			print "Canvas.__init__: after get dc: clip bounds =", win_graphics.GetClipBounds() ###
-#		dc.SetBkMode(wc.TRANSPARENT)
-#		dc.SetTextAlign(wc.TA_LEFT | wc.TA_BASELINE | wc.TA_UPDATECP)
-#		print "Canvas.__init__: clip bounds =", win_graphics.GetClipBounds() ###
-#		self._win_graphics = win_graphics
-#		self._win_dc = dc
-#		self._win_hdc = dc.GetHandleOutput()
-#		self._win_path = gdip.GraphicsPath()
-#		self._state = GState()
-#		self._stack = []
+#    def __init__(self, win_graphics, dc = None):
+#        if not dc:
+#            print "Canvas.__init__: before get dc: clip bounds =", win_graphics.GetClipBounds() ###
+#            dc = ui.CreateDCFromHandle(win_graphics.GetHDC())
+#            print "Canvas.__init__: after get dc: clip bounds =", win_graphics.GetClipBounds() ###
+#        dc.SetBkMode(wc.TRANSPARENT)
+#        dc.SetTextAlign(wc.TA_LEFT | wc.TA_BASELINE | wc.TA_UPDATECP)
+#        print "Canvas.__init__: clip bounds =", win_graphics.GetClipBounds() ###
+#        self._win_graphics = win_graphics
+#        self._win_dc = dc
+#        self._win_hdc = dc.GetHandleOutput()
+#        self._win_path = gdip.GraphicsPath()
+#        self._state = GState()
+#        self._stack = []
     
     def __init__(self, win_graphics, for_printing = False):
         self._win_graphics = win_graphics
         self._win_path = gdip.GraphicsPath()
         self._state = GState()
         self._stack = []
+
+        #Setup DC for Text Output
+        ## dc = ui.CreateDCFromHandle(win_graphics.GetHDC())
+        ## dc.SetBkMode(wc.TRANSPARENT)
+        ## dc.SetTextAlign(wc.TA_LEFT | wc.TA_BASELINE | wc.TA_UPDATECP)
+        ## self._win_dc = dc
+        ## self._win_hdc = dc.GetSafeHdc()#HandleOutput()
+        
         if for_printing:
             unit = gdip.UnitPoint
             win_graphics.SetPageUnit(unit)
         #else:
-        #	unit = gdip.UnitPixel
+        #    unit = gdip.UnitPixel
         
-#		dpix = win_graphics.GetDpiX()
-#		dpiy = win_graphics.GetDpiY()
-#		print "Canvas: dpi =", dpix, dpiy ###
-#		win_graphics.SetPageUnit(gdip.UnitPoint)
-#		if not for_printing:
-#			sx = 72.0 / dpix
-#			sy = 72.0 / dpiy
-#			self.scale(sx, sy)
+#        dpix = win_graphics.GetDpiX()
+#        dpiy = win_graphics.GetDpiY()
+#        print "Canvas: dpi =", dpix, dpiy ###
+#        win_graphics.SetPageUnit(gdip.UnitPoint)
+#        if not for_printing:
+#            sx = 72.0 / dpix
+#            sy = 72.0 / dpiy
+#            self.scale(sx, sy)
 
     def _from_win_dc(cls, dc):
         return cls._from_win_hdc(dc.GetSafeHdc())
@@ -194,6 +202,10 @@ class Canvas(GCanvas):
         g.SetSourceOverMode()
 
     def show_text(self, text):
+        self._gdi_show_text(text)
+        #self._gdip_show_text(text)
+        
+    def _gdip_show_text(self, text):
         font = self._state.font
         gf = font._win_gdip_font
         x, y = self._current_point
@@ -206,15 +218,19 @@ class Canvas(GCanvas):
 ##   GDI+ screws up some fonts (e.g. Times) for some reason.
 ##   Using plain GDI to draw text for now.
 ##
-#	def show_text(self, text):
-#		state = self._state
-#		x, y = self._current_point
-#		dc = self._win_dc
-#		dc.SelectObject(state.font._win_font)
-#		dc.SetTextColor(state.textcolor._win_color)
-#		dc.MoveTo(ir(x), ir(y))
-#		dc.TextOut(20, 20, text)
-#		self._current_point = dc.GetCurrentPosition()
+    def _gdi_show_text(self, text):
+        state = self._state
+        x, y = self._current_point
+        
+        dc = ui.CreateDCFromHandle(self._win_graphics.GetHDC())
+        dc.SetBkMode(wc.TRANSPARENT)
+        dc.SetTextAlign(wc.TA_LEFT | wc.TA_BASELINE | wc.TA_UPDATECP)
+        dc.SelectObject(state.font._win_font)
+        dc.SetTextColor(state.textcolor._win_color)
+        dc.MoveTo(ir(x), ir(y))
+        dc.TextOut(0, 0, text)
+        self._current_point = dc.GetCurrentPosition()
+        self._win_graphics.ReleaseHDC(dc.GetSafeHdc())
 
     def clip(self):
         self._win_graphics.SetClip_PI(self._win_path)

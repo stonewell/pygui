@@ -11,6 +11,7 @@ try:
 except ImportError:
     class ndarray(object):
         pass
+import struct
 
 #wg = windll.gdiplus
 wg = oledll.gdiplus
@@ -50,7 +51,7 @@ PixelFormatGDI         = 0x00020000 # Is a GDI-supported format
 PixelFormatAlpha       = 0x00040000 # Has an alpha component
 PixelFormatPAlpha      = 0x00080000 # Pre-multiplied alpha
 PixelFormatExtended    = 0x00100000 # Extended color 16 bits/channel
-PixelFormatCanonical   = 0x00200000 
+PixelFormatCanonical   = 0x00200000
 
 PixelFormat1bppIndexed    = (1 | ( 1 << 8) | PixelFormatIndexed | PixelFormatGDI)
 PixelFormat4bppIndexed    = (2 | ( 4 << 8) | PixelFormatIndexed | PixelFormatGDI)
@@ -136,7 +137,7 @@ class Pen(object):
         ptr = c_void_p()
         wg.GdipCreatePen1(argb, c_float(size), UnitWorld, byref(ptr))
         self.ptr = ptr
-    
+
     def __del__(self, wg = wg):
         wg.GdipDeletePen(self.ptr)
 
@@ -148,10 +149,10 @@ class SolidBrush(object):
         ptr = c_void_p()
         wg.GdipCreateSolidFill(argb, byref(ptr))
         self.ptr = ptr
-    
+
     def __del__(self, wg = wg):
         wg.GdipDeleteBrush(self.ptr)
-    
+
     def __str__(self):
         argb = c_ulong()
         wg.GdipGetSolidFillColor(self.ptr, byref(argb))
@@ -181,9 +182,34 @@ class Font(object):
         wg.GdipCreateFontFromDC(hdc, byref(ptr))
         self.ptr = ptr
         return self
-    
+
+    def from_logfont(cls, hdc, logfont):
+        self = cls.__new__(cls)
+        ptr = c_void_p()
+
+        _format = 'iiiiiBBBBBBBB{}s'.format(len(logfont.lfFaceName))
+        buf = struct.pack(_format,logfont.lfHeight,
+                          logfont.lfWidth,
+                          logfont.lfEscapement,
+                          logfont.lfOrientation,
+                          logfont.lfWeight,
+                          logfont.lfItalic & 0xFF,
+                          logfont.lfUnderline & 0xFF,
+                          logfont.lfStrikeOut & 0xFF,
+                          logfont.lfCharSet & 0xFF,
+                          logfont.lfOutPrecision & 0xFF,
+                          logfont.lfClipPrecision & 0xFF,
+                          logfont.lfQuality & 0xFF,
+                          logfont.lfPitchAndFamily & 0xFF,
+                          bytes(logfont.lfFaceName))
+
+        print logfont.lfFaceName, _format, wg.GdipCreateFontFromLogfontW(hdc, buf, byref(ptr)), ptr
+        self.ptr = ptr
+        return self
+
     from_hdc = classmethod(from_hdc)
-        
+    from_logfont = classmethod(from_logfont)
+
     def __del__(self, wg = wg):
         wg.GdipDeleteFont(self.ptr)
 
@@ -201,9 +227,9 @@ class Image(object):
         self._create_from_file(upath, ptr)
         self.ptr = ptr
         return self
-    
+
     from_file = classmethod(from_file)
-    
+
     def _create_from_file(self, upath, ptr):
         wg.GdipLoadImageFromFile(upath, byref(ptr))
 
@@ -233,7 +259,7 @@ class Bitmap(Image):
 
     def _create_from_file(self, upath, ptr):
         wg.GdipCreateBitmapFromFile(upath, byref(ptr))
-    
+
     def from_data(cls, width, height, format, data):
         self = cls.__new__(cls)
         ptr = c_void_p()
@@ -242,9 +268,9 @@ class Bitmap(Image):
         wg.GdipCreateBitmapFromScan0(width, height, row_stride, format, data, byref(ptr))
         self.ptr = ptr
         return self
-    
+
     from_data = classmethod(from_data)
-    
+
     def __str__(self):
         return "<Bitmap 0x%x>" % self.ptr.value
 
@@ -252,12 +278,12 @@ class Bitmap(Image):
         hicon = c_ulong()
         wg.GdipCreateHICONFromBitmap(self.ptr, byref(hicon))
         return hicon.value
-    
+
     def GetPixel(self, x, y):
         c = c_ulong()
         wg.GdipBitmapGetPixel(self.ptr, x, y, byref(c))
         return c.value
-    
+
     def SetPixel(self, x, y, c):
         wg.GdipBitmapSetPixel(self.ptr, x, y, c)
 
@@ -269,10 +295,10 @@ class GraphicsPath(object):
         ptr = c_void_p()
         wg.GdipCreatePath(FillModeAlternate, byref(ptr))
         self.ptr = ptr
-    
+
     def __del__(self, wg = wg):
         wg.GdipDeletePath(self.ptr)
-    
+
     def Reset(self):
         wg.GdipResetPath(self.ptr)
 
@@ -282,7 +308,7 @@ class GraphicsPath(object):
     def AddLine_4f(self, x0, y0, x1, y1):
         wg.GdipAddPathLine(self.ptr,
             c_float(x0), c_float(y0), c_float(x1), c_float(y1))
-    
+
     def AddBezier_4p(self, p0, p1, p2, p3):
         x0, y0 = p0
         x1, y1 = p1
@@ -291,22 +317,22 @@ class GraphicsPath(object):
         wg.GdipAddPathBezier(self.ptr,
             c_float(x0), c_float(y0), c_float(x1), c_float(y1),
             c_float(x2), c_float(y2), c_float(x3), c_float(y3))
-    
+
     def AddBeziers_pv(self, points):
         wg.GdipAddPathBeziers(self.ptr, *points_args(points))
-    
+
     def AddRectangle_r(self, rect):
         wg.GdipAddPathRectangle(self.ptr, *rect_args(rect))
-    
+
     def AddEllipse_r(self, rect):
         wg.GdipAddPathEllipse(self.ptr, *rect_args(rect))
-    
+
     def AddArc_p3f(self, c, r, a0, a1):
         wg.GdipAddPathArc(self.ptr, *arc_args(c, r, a0, a1))
 
     def AddPie_p3f(self, c, r, a0, a1):
         wg.GdipAddPathPie(self.ptr, *arc_args(c, r, a0, a1))
-    
+
     def AddLines_pv(self, points):
         wg.GdipAddPathLine2(self.ptr, *points_args(points))
 
@@ -315,12 +341,12 @@ class GraphicsPath(object):
 
     def CloseFigure(self):
         wg.GdipClosePathFigure(self.ptr)
-    
+
     def GetLastPoint(self):
         p = PointF()
         wg.GdipGetPathLastPoint(self.ptr, byref(p))
         return p.x, p.y
-    
+
 #--------------------------------------------------------------------
 
 class Graphics(object):
@@ -331,14 +357,14 @@ class Graphics(object):
         wg.GdipCreateFromHDC(c_ulong(hdc), byref(ptr))
         self.ptr = ptr
         return self
-    
+
     from_hdc = classmethod(from_hdc)
-    
+
     def from_dc(cls, dc):
         return cls.from_hdc(dc.GetSafeHdc())
-    
+
     from_dc = classmethod(from_dc)
-    
+
     def from_image(cls, image):
         #print "Graphics.from_image:", repr(image) ###
         #print "...", image ###
@@ -347,50 +373,50 @@ class Graphics(object):
         wg.GdipGetImageGraphicsContext(image.ptr, byref(ptr))
         self.ptr = ptr
         return self
-    
+
     from_image = classmethod(from_image)
-    
+
     def __del__(self, wg = wg):
         wg.GdipDeleteGraphics(self.ptr)
-    
+
     def __str__(self):
         return "<Graphics 0x%x>" % self.ptr.value
-    
+
     def GetHDC(self):
         hdc = c_long()
         wg.GdipGetDC(self.ptr, byref(hdc))
         return hdc.value
-    
+
     def ReleaseHDC(self, hdc):
         wg.GdipReleaseDC(self.ptr, hdc)
-    
+
     def GetDpiX(self):
         result = c_float()
         wg.GdipGetDpiX(self.ptr, byref(result))
         return result.value
-    
+
     def GetDpiY(self):
         result = c_float()
         wg.GdipGetDpiY(self.ptr, byref(result))
         return result.value
-    
+
     def SetPageUnit(self, unit):
         self.unit = unit
         wg.GdipSetPageUnit(self.ptr, unit)
-    
+
     def GetClipBounds(self):
         r = RectF()
         wg.GdipGetClipBounds(self.ptr, byref(r))
         return (r.x, r.y, r.x + r.width, r.y + r.height)
-    
+
     def Save(self):
         state = c_uint()
         wg.GdipSaveGraphics(self.ptr, byref(state))
         return state.value
-    
+
     def Restore(self, state):
         wg.GdipRestoreGraphics(self.ptr, state)
-    
+
     def DrawImage_rr(self, image, dst_rect, src_rect):
         sl, st, sr, sb = src_rect
         dl, dt, dr, db = dst_rect
@@ -401,7 +427,7 @@ class Graphics(object):
 
     def DrawPath(self, pen, path):
         wg.GdipDrawPath(self.ptr, pen.ptr, path.ptr)
-    
+
     def FillPath(self, brush, path):
         wg.GdipFillPath(self.ptr, brush.ptr, path.ptr)
 
@@ -416,7 +442,7 @@ class Graphics(object):
         wg.GdipMeasureDriverString(self.ptr, wtext, n, font.ptr, byref(pos),
             flags, None, byref(b))
         return b.width
-    
+
     def MeasureStringWidth(self, text, font):
         wtext = unicode(text)
         n = len(text)
@@ -433,7 +459,7 @@ class Graphics(object):
     def SetClip_rI(self, rect):
         x, y, w, h = rect_args(rect)
         wg.GdipSetClipRect(self.ptr, x, y, w, h, CombineModeIntersect)
-    
+
     def DrawRectangle_r(self, pen, rect):
         wg.GdipDrawRectangle(self.ptr, pen.ptr, *rect_args(rect))
 
@@ -441,32 +467,32 @@ class Graphics(object):
         #print "Graphics.FillRectangle_r:", self, brush, rect ###
         #print "... clip bounds =", self.GetClipBounds() ###
         wg.GdipFillRectangle(self.ptr, brush.ptr, *rect_args(rect))
-    
+
     def DrawEllipse_r(self, pen, rect):
         wg.GdipDrawEllipse(self.ptr, pen.ptr, *rect_args(rect))
 
     def FillEllipse_r(self, brush, rect):
         wg.GdipFillEllipse(self.ptr, brush.ptr, *rect_args(rect))
-    
+
     def DrawArc_3pf(self, pen, c, r, a0, a1):
         wg.GdipDrawArc(self.ptr, pen.ptr, *arc_args(c, r, a0, a1))
-    
+
     def DrawPie_p3f(self, pen, c, r, a0, a1):
         wg.GdipDrawPie(self.ptr, pen.ptr, *arc_args(c, r, a0, a1))
-    
+
     def FillPie_p3f(self, brush, c, r, a0, a1):
         wg.GdipFillPie(self.ptr, brush.ptr, *arc_args(c, r, a0, a1))
-    
+
     def DrawPolygon_pv(self, pen, points):
         wg.GdipDrawPolygon(self.ptr, pen.ptr, *points_args(points))
-    
+
     def FillPolygon_pv(self, brush, points):
         buf, n = points_args(points)
         wg.GdipFillPolygon(self.ptr, brush.ptr, buf, n, FillModeAlternate)
-    
+
     def DrawBeziers_pv(self, pen,  points):
         wg.GdipDrawBeziers(self.ptr, pen.ptr, *points_args(points))
-    
+
     def DrawLines_pv(self, pen, points):
         wg.GdipDrawLines(self.ptr, pen.ptr, *points_args(points))
 
