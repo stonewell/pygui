@@ -6,9 +6,7 @@ import gtk
 from GUI import export
 from GUI.StdFonts import system_font
 from GUI.GTabViews import TabView as GTabView
-
-_gtk_extra_hpad = 5   # Amount to add to default width at each end
-_gtk_icon_spacing = 2  # Space to leave between icon and label
+from GUI.GContainers import Container as GContainer
 
 class TabView(GTabView):
 
@@ -67,4 +65,9 @@ class TabView(GTabView):
 
         _gtk_notebook.set_current_page(index)
 
+    def _add(self, comp):
+        GContainer._add(self, comp)
+
+    def _remove(self, comp):
+        GContainer._remove(self, comp)
 export(TabView)
