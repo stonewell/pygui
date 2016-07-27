@@ -168,7 +168,7 @@ class Font(GFont):
         #self._win_gdip_font = gdip.Font.from_hdc(dc.GetSafeHdc())
         win_none.ReleaseDC(dc)
 
-    def _width(self, s):
+    def _gdi_width(self, s):
         dc = win_none.GetDC()
         dc.SelectObject(self._win_font)
         #w, h = dc.GetTextExtent(s)
@@ -176,13 +176,19 @@ class Font(GFont):
         win_none.ReleaseDC(dc)
         return w
 
-    ## def _width(self, s):
-    ##     dc = win_none.GetDC()
-    ##     dc.SelectObject(self._win_font)
-    ##     g = gdip.Graphics.from_hdc(dc.GetSafeHdc())
-    ##     w = g.MeasureStringWidth(s, self._win_gdip_font)
-    ##     win_none.ReleaseDC(dc)
-    ##     return w
+    def _gdip_width(self, s):
+        dc = win_none.GetDC()
+        dc.SelectObject(self._win_font)
+        g = gdip.Graphics.from_hdc(dc.GetSafeHdc())
+        w = g.MeasureStringWidth(s, self._win_gdip_font)
+        win_none.ReleaseDC(dc)
+        return w
+
+    def _width(self, s):
+        if self._win_gdip_font is not None and self._win_gdip_font.ptr.value is not None:
+            return self._gdip_width(s)
+        else:
+            return self._gdi_width(s)
 
     def info(self):
         return "<Font family=%r size=%s style=%s ascent=%s descent=%s " \

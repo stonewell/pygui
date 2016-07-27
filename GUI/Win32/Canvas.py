@@ -202,8 +202,12 @@ class Canvas(GCanvas):
         g.SetSourceOverMode()
 
     def show_text(self, text):
-        self._gdi_show_text(text)
-        #self._gdip_show_text(text)
+        font = self._state.font
+        gf = font._win_gdip_font
+        if gf is not None and gf.ptr.value is not None:
+            self._gdip_show_text(text)
+        else:
+            self._gdi_show_text(text)
         
     def _gdip_show_text(self, text):
         font = self._state.font

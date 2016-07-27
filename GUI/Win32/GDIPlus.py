@@ -437,6 +437,7 @@ class Graphics(object):
         pos = PointF(x, y)
         flags = 5 # DriverStringOptions CmapLookup+RealizedAdvance
         b = RectF()
+        wg.GdipSetTextRenderingHint(self.ptr, 4)#TextRenderingHintAntiAlias
         wg.GdipDrawDriverString(self.ptr, wtext, n, font.ptr, brush.ptr,
             byref(pos), flags, None)
         wg.GdipMeasureDriverString(self.ptr, wtext, n, font.ptr, byref(pos),
