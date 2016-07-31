@@ -101,6 +101,8 @@ class Application(GApplication):
     def get_clipboard(self):
         wcb.OpenClipboard()
         try:
+            if wcb.IsClipboardFormatAvailable(wc.CF_UNICODETEXT):
+                return wcb.GetClipboardData(wc.CF_UNICODETEXT).encode('utf-8')
             result = wcb.GetClipboardData()
         except TypeError:
             result = None
