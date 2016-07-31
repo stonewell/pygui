@@ -252,7 +252,7 @@ class Bitmap(Image):
 
     def __init__(self, width, height):
         ptr = c_void_p()
-        format = PixelFormat32bppARGB
+        format = PixelFormat32bppPARGB
         wg.GdipCreateBitmapFromScan0(width, height, 0, format, None, byref(ptr))
         self.ptr = ptr
         #print "GDIPlus.Bitmap:", (width, height), repr(self), "ptr =", self.ptr ###
@@ -278,6 +278,11 @@ class Bitmap(Image):
         hicon = c_ulong()
         wg.GdipCreateHICONFromBitmap(self.ptr, byref(hicon))
         return hicon.value
+
+    def GetHBITMAP(self):
+        hbitmap = c_ulong()
+        wg.GdipCreateHBITMAPFromBitmap(self.ptr, byref(hbitmap), 0)
+        return hbitmap.value
 
     def GetPixel(self, x, y):
         c = c_ulong()
@@ -420,6 +425,12 @@ class Graphics(object):
     def DrawImage_rr(self, image, dst_rect, src_rect):
         sl, st, sr, sb = src_rect
         dl, dt, dr, db = dst_rect
+        wg.GdipSetCompositingMode(self.ptr, 1)
+        wg.GdipSetCompositingQuality(self.ptr, 1)
+        wg.GdipSetPixelOffsetMode(self.ptr, 3)
+        wg.GdipSetInterpolationMode(self.ptr, 5)
+        wg.GdipSetSmoothingMode(self.ptr, 1)
+
         wg.GdipDrawImageRectRect(self.ptr, image.ptr,
             c_float(dl), c_float(dt), c_float(dr - dl), c_float(db - dt),
             c_float(sl), c_float(st), c_float(sr - sl), c_float(sb - st),

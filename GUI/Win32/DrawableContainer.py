@@ -9,6 +9,9 @@ from GUI import Canvas
 from GUI.Geometry import rect_topleft, rect_size, offset_rect, empty_rect
 from GUI.GDrawableContainers import DrawableContainer as GDrawableContainer
 import GUI.GDIPlus as gdi
+import win32gui as gui
+import win32ui as ui
+import win32con
 
 class DrawableContainer(GDrawableContainer):
 
@@ -42,13 +45,28 @@ class DrawableContainer(GDrawableContainer):
                         if self._double_buffer:
                             dx, dy = rect_topleft(view_update_rect)
                             width, height = rect_size(view_update_rect)
-                            buffer = gdi.Bitmap(width, height)
-                            canvas = Canvas._from_win_image(buffer)
-                            canvas.translate(-dx, -dy)
+                            #GDIPlus draw large image in very bad performance
+                            #use GDI instead
+                            #buffer = gdi.Bitmap(width, height)
+                            #canvas = Canvas._from_win_image(buffer)
+                            #canvas.translate(-dx, -dy)
+                            #self.draw(canvas, view_update_rect)
+                            #graphics = gdi.Graphics.from_dc(dc)
+                            #src_rect = (0, 0, width, height)
+                            #graphics.DrawImage_rr(buffer, win_update_rect, src_rect)
+
+                            c_dc = dc.CreateCompatibleDC(dc)
+                            c_dm = ui.CreateBitmap()
+                            c_dm.CreateCompatibleBitmap(dc, width, height)
+                            old = c_dc.SelectObject(c_dm)
+                            c_dc.SetViewportOrg((-dx, -dy))
+                            canvas = Canvas._from_win_dc(c_dc)
+
                             self.draw(canvas, view_update_rect)
-                            graphics = gdi.Graphics.from_dc(dc)
-                            src_rect = (0, 0, width, height)
-                            graphics.DrawImage_rr(buffer, win_update_rect, src_rect)
+
+                            l, t = rect_topleft(win_update_rect)
+                            dc.BitBlt((l, t), (width, height), c_dc, (0, 0), win32con.SRCCOPY)
+                            c_dc.SelectObject(old)
                         else:
                             self._win_prepare_dc(dc)
                             canvas = Canvas._from_win_dc(dc)
@@ -61,7 +79,7 @@ class DrawableContainer(GDrawableContainer):
 
     def _win_prepare_dc(self, dc):
         dc.SetWindowOrg(self._win_scroll_offset())
-    
+
     def _win_scroll_offset(self):
         return (0, 0)
 

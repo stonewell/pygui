@@ -218,10 +218,6 @@ class Canvas(GCanvas):
         w = g.DrawAndMeasureStringWidth_2f(text, gf, x, y, brush)
         self._current_point = x + w, y
     
-##
-##   GDI+ screws up some fonts (e.g. Times) for some reason.
-##   Using plain GDI to draw text for now.
-##
     def _gdi_show_text(self, text):
         state = self._state
         x, y = self._current_point
