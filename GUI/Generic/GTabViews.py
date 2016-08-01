@@ -39,10 +39,4 @@ class TabView(Container):
 
     def set_selected_index(self, index):
         raise NotImplementedError
-
-    def _resized(self, delta):
-        self.resized(delta)
-
-    def resized(self, delta):
-        pass
         
