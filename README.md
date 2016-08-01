@@ -1,6 +1,11 @@
 # pygui
 a fork from old pygui, http://www.cosc.canterbury.ac.nz/greg.ewing/python_gui/
 
+Changes
+* Add new control TabView
+* Fixing Windows onPaint performance issue, use GDI instead GDIPlus for double buffering
+* Use GDI to show text when gdiplus cannot handle the font
+
 Readme from original author
 Welcome to PyGUI
 ================
