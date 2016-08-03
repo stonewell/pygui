@@ -23,10 +23,10 @@ class Container(Component):
     content_width = overridable_property('content_width', "Width of the content area.")
     content_height = overridable_property('content_height', "Height of the content area.")
     content_size = overridable_property('content_size', "Size of the content area.")
-    
+
     auto_layout = overridable_property('auto_layout',
         "Automatically adjust layout of subcomponents when resized.")
-    
+
     _auto_layout = True
 
     #  _contents   [Component]
@@ -48,10 +48,10 @@ class Container(Component):
     #
     #   Content area
     #
-    
+
     def get_content_width(self):
         return self.content_size[0]
-    
+
     def set_content_width(self, w):
         self.content_size = w, self.content_height
 
@@ -60,14 +60,14 @@ class Container(Component):
 
     def set_content_height(self, h):
         self.content_size = self.content_width, h
-    
+
     get_content_size = Component.get_size
     set_content_size = Component.set_size
 
     #
     #		Subcomponent Management
     #
-    
+
     def get_contents(self):
         return self._contents
 
@@ -88,41 +88,41 @@ class Container(Component):
         else:
             for item in comp:
                 self.remove(item)
-    
+
     def _add(self, comp):
         # Called by comp.set_container() to implement subcomponent addition.
         self._contents.append(comp)
         self._invalidate_tab_chain()
         self.added(comp)
-    
+
     def _remove(self, comp):
         # Called by comp.set_container() to implement subcomponent removal.
         self._contents.remove(comp)
         self._invalidate_tab_chain()
         self.removed(comp)
-    
+
     def added(self, comp):
         """Called after a subcomponent has been added."""
         pass
-    
+
     def removed(self, comp):
         """Called after a subcomponent has been removed."""
         pass
-    
+
     #
     #   The infamous 'place' method and friends.
     #
-    
+
     _place_default_spacing = 8
-    
-    def place(self, item, 
+
+    def place(self, item,
             left = None, right = None, top = None, bottom = None,
             sticky = 'nw', scrolling = '', border = None, anchor = None):
         """Add a component to the frame with positioning,
         resizing	and scrolling options. See the manual for details."""
         self._place([item], left = left, right = right, top = top, bottom = bottom,
             sticky = sticky, scrolling = scrolling, border = border, anchor = anchor)
-    
+
     def place_row(self, items,
             left = None, right = None, top = None, bottom = None,
             sticky = 'nw', scrolling = '', border = None, spacing = None,
@@ -159,7 +159,7 @@ class Container(Component):
             sticky = sticky, scrolling = scrolling, border = border,
             direction = direction, spacing = spacing, anchor = anchor)
 
-    def _place(self, items, 
+    def _place(self, items,
             left = None,
             right = None,
             top = None,
@@ -170,7 +170,7 @@ class Container(Component):
             spacing = None,
             border = None,
             anchor = None):
-        
+
         def side(spec, name):
             #  Process a side specification taking the form of either
             #  (1) an offset, (2) a reference component, or (3) a
@@ -201,10 +201,10 @@ class Container(Component):
                     raise ValueError("Reference component for place() is not"
                         " directly contained by the frame being placed into.")
             return ref, offset
-        
+
         if spacing is None:
             spacing = self._place_default_spacing
-        
+
         # Decode the sticky options
         if anchor is not None:
             sticky = anchor.translate(anchor_to_sticky)
@@ -219,19 +219,19 @@ class Container(Component):
                 vstretch = 1
             else:
                 vmove = 1
-        
+
         # Translate the direction argument
         try:
             dir = {'right':0, 'down':1, 'left':2, 'up':3}[direction]
         except KeyError:
             raise ArgumentError(self, 'place', 'direction', direction)
-            
+
         # Unpack the side arguments
         left_obj, left_off = side(left, 'left')
         right_obj, right_off = side(right, 'right')
         top_obj, top_off = side(top, 'top')
         bottom_obj, bottom_off = side(bottom, 'bottom')
-        
+
         # Process the items
         #if not isinstance(items, list):
         #	items = [items]
@@ -322,7 +322,7 @@ class Container(Component):
     #
     #		Resizing
     #
-    
+
     def _resized(self, delta):
         if self._auto_layout:
             self.resized(delta)
@@ -330,7 +330,7 @@ class Container(Component):
     def resized(self, delta):
         for c in self._contents:
             c.container_resized(delta)
-    
+
     def resize(self, auto_layout = False, **kwds):
         """Change the geometry of the component, with control over whether
         the layout of subcomponents is updated. The default is not to do so.
@@ -343,11 +343,11 @@ class Container(Component):
             self.set(**kwds)
         finally:
             self.auto_layout = old_auto_layout
-        
+
     #
     #   Tabbing
     #
-    
+
     def _build_tab_chain(self, chain):
         Component._build_tab_chain(self, chain)
         for c in self._contents:
@@ -356,7 +356,7 @@ class Container(Component):
     #
     #   Other
     #
-    
+
     def shrink_wrap(self, padding = None):
         """Adjust the size of the component so that it neatly encloses its
         contents. If padding is specified, it specifies the amount of space
@@ -373,7 +373,7 @@ class Container(Component):
         rights = [item.right for item in contents]
         bottoms = [item.bottom for item in contents]
         self.resize(size = (max(rights) + hpad, max(bottoms) + vpad))
-    
+
     def broadcast(self, message, *args):
         """Traverse the component hierarchy, calling each component's handler for
         the given message, if any."""

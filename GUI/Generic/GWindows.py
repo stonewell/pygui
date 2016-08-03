@@ -9,14 +9,14 @@ from GUI import application
 
 class Window(Container):
     """Top-level Container."""
-    
+
     menus = overridable_property('menus', "Menus to be available when this window is active.")
     document = overridable_property('document', "Document with which this window is associated.")
     title = overridable_property('title', "Title of the window.")
-    auto_position = overridable_property('auto_position', "Whether to position automatically when first shown.")	
+    auto_position = overridable_property('auto_position', "Whether to position automatically when first shown.")
     target = overridable_property('target', "Current target for key events and menu messages.")
     tab_chain = overridable_property('tab_chain', "List of subcomponents in tabbing order.")
-    visible = overridable_property('visible', "Whether the window is currently shown.")	
+    visible = overridable_property('visible', "Whether the window is currently shown.")
 
     keeps_document_open = True
 
@@ -24,7 +24,7 @@ class Window(Container):
     _default_height = 200
     _modal_styles = ('modal_dialog', 'alert')
     _dialog_styles = ('nonmodal_dialog', 'modal_dialog', 'alert')
-    
+
     _menus = []
     _document = None
     _closable = 0
@@ -57,14 +57,14 @@ class Window(Container):
             return self._document
         else:
             return application()
-    
+
     def dispatch(self, message, *args):
         self.target.handle(message, *args)
 
     #
     #		Menus
     #
-    
+
     def get_menus(self):
         return self._menus
 
@@ -74,10 +74,10 @@ class Window(Container):
     #
     #		Document association
     #
-    
+
     def get_document(self):
         return self._document
-    
+
     def set_document(self, x):
         if self._document != x:
             if self._document:
@@ -90,23 +90,23 @@ class Window(Container):
     #
     #		Title
     #
-    
+
     def update_title(self):
         """Update the window's title after a change in its document's title."""
         doc = self._document
         if doc:
             self.set_title(doc.title)
-    
+
     #
     #   Showing and Positioning
     #
-    
+
     def get_auto_position(self):
         return self._auto_position
-    
+
     def set_auto_position(self, v):
         self._auto_position = v
-    
+
     def center(self):
         """Position the window in the centre of the screen."""
         print "GWindow.center" ###
@@ -115,7 +115,7 @@ class Window(Container):
         l = (sr - sl - w) // 2
         t = (sb - st - h) // 2
         self.position = (l, t)
-    
+
     def centre(self):
         self.center()
 
@@ -127,10 +127,10 @@ class Window(Container):
                 self.center()
             self._auto_position = False
         self._show()
-    
+
     def _stagger(self):
         pass
-    
+
     def _show(self):
         self.visible = True
 
@@ -166,11 +166,11 @@ class Window(Container):
             doc.close_cmd()
         else:
             self.destroy()
-    
+
     #
     #   Tabbing
     #
-    
+
     def get_tab_chain(self):
         chain = self._tab_chain
         if chain is None:
@@ -179,13 +179,13 @@ class Window(Container):
             self._tab_chain = chain
         #print "Window.get_tab_chain:", chain ###
         return chain
-    
+
     def _invalidate_tab_chain(self):
         self._tab_chain = None
-    
+
     def _tab_to_next(self):
         self._tab_to(1)
-    
+
     def _tab_to_prev(self):
         self._tab_to(-1)
 
@@ -234,7 +234,7 @@ class Window(Container):
     #
     #   Other
     #
-    
+
     def get_window(self):
         return self
 
@@ -251,7 +251,7 @@ class Window(Container):
         #  Implementations can override this together with exit_modal_event_loop()
         #  to implement modal event loops in a different way.
         application()._event_loop(self)
-    
+
     def exit_modal_event_loop(self):
         #  Cause the current call to modal_event_loop() to exit.
         application()._exit_event_loop()

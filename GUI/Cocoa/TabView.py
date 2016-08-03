@@ -122,10 +122,19 @@ class TabView(GTabView):
         for c in self._contents:
             c.bounds = child_bounds
 
+    def container_resized(self, delta):
+        GTabView.container_resized(self, delta)
+
 #------------------------------------------------------------------------------
 
 class PyGUI_NSTabView(NSTabView, PyGUI_NS_EventHandler):
     __metaclass__ = NSMultiClass
     __slots__ = ['pygui_component']
+
+    def viewWillStartLiveResize(self):
+        pass
+
+    def viewDidEndLiveResize(self):
+        self.setNeedsDisplay_(True)
 
 export(TabView)
