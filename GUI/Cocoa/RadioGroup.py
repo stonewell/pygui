@@ -12,10 +12,10 @@ class RadioGroup(GRadioGroup):
 
     def _item_added(self, item):
         item._update()
-    
+
     def _item_removed(self, item):
         pass
-    
+
     def _value_changed(self):
         for item in self._items:
             item._update()

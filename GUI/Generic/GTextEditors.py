@@ -10,13 +10,13 @@ from GUI.Printing import Printable
 class TextEditor(Component, EditCmdHandler, Printable):
     """A component for editing substantial amounts of text. The text is
     kept internally to the component and cannot be shared between views."""
-    
+
     text = overridable_property('text', "The contents as a string.")
     text_length = overridable_property('text_length', "Number of characters in the text.")
     selection = overridable_property('selection', "Range of text selected.")
     font = overridable_property('font')
     tab_spacing = overridable_property('tab_spacing', "Distance between tab stops")
-    
+
     def setup_menus(self, m):
         Component.setup_menus(self, m)
         EditCmdHandler.setup_menus(self, m)

@@ -14,41 +14,41 @@ class Dialog(Window, ActionBase):
 
 #	default_button = overridable_property('default_button',
 #		"Button to be activated by the default key.")
-#	
+#
 #	cancel_button = overridable_property('cancel_button',
 #		"Button to be activated by the cancel key.")
-#	
+#
 #	_default_button = None
 #	_cancel_button = None
 
     default_action = action_property('default_action',
         "Action to perform when Return or Enter is pressed.")
-    
+
     cancel_action = action_property('cancel_action',
         "Action to perform when Escape is pressed.")
-    
+
     _default_action = 'ok'
     _cancel_action  ='cancel'
 
-    def __init__(self, style = 'nonmodal_dialog', 
+    def __init__(self, style = 'nonmodal_dialog',
             closable = 0, zoomable = 0, resizable = 0, **kwds):
         if 'title' not in kwds:
             kwds['title'] = Globals.application_name
-        Window.__init__(self, style = style, 
+        Window.__init__(self, style = style,
             closable = closable, zoomable = zoomable, resizable = resizable,
             **kwds)
-    
+
 #	def get_default_button(self):
 #		return self._default_button
-#	
+#
 #	def set_default_button(self, button):
 #		self._default_button = button
 #		if button:
 #			button.style = 'default'
-#	
+#
 #	def get_cancel_button(self):
 #		return self._cancel_button
-#	
+#
 #	def set_cancel_button(self, button):
 #		self._cancel_button = button
 #		if button:

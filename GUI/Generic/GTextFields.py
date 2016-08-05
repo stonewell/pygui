@@ -10,7 +10,7 @@ from GUI import EditCmdHandler
 
 class TextField(Control, ActionBase, EditCmdHandler):
     """A control for entering and editing small amounts of text."""
-    
+
     text = overridable_property('text')
     selection = overridable_property('selection', "Range of text selected.")
     multiline = overridable_property('multiline', "Multiple text lines allowed.")
@@ -19,7 +19,7 @@ class TextField(Control, ActionBase, EditCmdHandler):
         "when the Return or Enter key is pressed.")
     escape_action = action_property('escape_action', "Action to be performed "
         "when the Escape key is pressed.")
-    
+
     _may_be_password = True
 
     #_tabbable = True
@@ -27,16 +27,16 @@ class TextField(Control, ActionBase, EditCmdHandler):
     _user_tab_stop_override = False
     _enter_action = 'do_default_action'
     _escape_action = 'do_cancel_action'
-    
+
     _intercept_tab_key = True
-    
+
     def __init__(self, **kwds):
         self._multiline = kwds.pop('multiline')
         Control.__init__(self, **kwds)
-    
+
     def get_multiline(self):
         return self._multiline
-    
+
     def key_down(self, event):
         #print "GTextField.key_down for", self ###
         c = event.char
@@ -51,8 +51,8 @@ class TextField(Control, ActionBase, EditCmdHandler):
             if self._intercept_tab_key:
                 self.pass_event_to_next_handler(event)
                 return
-        Control.key_down(self, event)		
-    
+        Control.key_down(self, event)
+
     def setup_menus(self, m):
         Control.setup_menus(self, m)
         EditCmdHandler.setup_menus(self, m)
@@ -67,10 +67,9 @@ class TextField(Control, ActionBase, EditCmdHandler):
         #  Implementations can override this if they have a more
         #  efficient way of getting the text length.
         return len(self.text)
-    
+
     def get_value(self):
         return self.text
-    
+
     def set_value(self, x):
         self.text = x
-

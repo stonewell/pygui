@@ -19,11 +19,11 @@ class Control(Component):
         "Height of the control measured in lines of the current font.")
     tab_stop = overridable_property('tab_stop',
         "Whether tab key can navigate into this control.")
-    
+
     _vertical_padding = 0 # Extra height to add when setting 'lines' property
     _default_tab_stop = True
     _user_tab_stop_override = True
-    
+
     def __init__(self, font = None, lines = None, **kwds):
         Component.__init__(self, **kwds)
         #  If font and lines are both specified, must set font first.
@@ -31,10 +31,10 @@ class Control(Component):
             self.font = font
         if lines is not None:
             self.lines = lines
-    
+
     def get_lines(self):
         return int(round((self.height - self._vertical_padding) / self.font.line_height))
-    
+
     def set_lines(self, num_lines):
         self.height = self._calc_height(self.font, num_lines)
 
@@ -43,4 +43,3 @@ class Control(Component):
 
     def _is_targetable(self):
         return self.enabled
-            

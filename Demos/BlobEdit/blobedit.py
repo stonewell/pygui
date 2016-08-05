@@ -23,12 +23,12 @@ class BlobApp(Application):
 
     def __init__(self):
         Application.__init__(self)
-        self.blob_type = FileType(name = "Blob Document", suffix = "blob", 
+        self.blob_type = FileType(name = "Blob Document", suffix = "blob",
             #mac_creator = "BLBE", mac_type = "BLOB", # These are optional
         )
         self.file_type = self.blob_type
         self.blob_cursor = Cursor("blob.tiff")
-    
+
     def open_app(self):
         self.new_cmd()
 
@@ -63,14 +63,14 @@ class BlobView(ScrollableView):
                 self.model.delete_blob(blob)
         else:
                 self.model.add_blob(Blob(x, y))
-    
+
     def drag_blob(self, blob, x0, y0):
         for event in self.track_mouse():
             x, y = event.position
             self.model.move_blob(blob, x - x0, y - y0)
             x0 = x
             y0 = y
-    
+
     def blob_changed(self, model, blob):
         self.invalidate_rect(blob.rect)
 
@@ -104,7 +104,7 @@ class BlobDoc(Document):
         blob.move(dx, dy)
         self.changed()
         self.notify_views('blob_changed', blob)
-    
+
     def delete_blob(self, blob):
         self.notify_views('blob_changed', blob)
         self.blobs.remove(blob)
@@ -118,7 +118,7 @@ class Blob:
 
     def contains(self, x, y):
         return pt_in_rect((x, y), self.rect)
-    
+
     def intersects(self, rect):
         return rects_intersect(rect, self.rect)
 
