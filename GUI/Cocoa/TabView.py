@@ -25,7 +25,7 @@ class TabView(GTabView):
         ns_tabview = PyGUI_NSTabView.alloc().init()
         ns_tabview.pygui_component = self
         ns_tabview.setFont_(font._ns_font)
-        ns_tabview.setDelegate_(self)
+        ns_tabview.setDelegate_(ns_tabview)
 
         return ns_tabview
 
@@ -86,9 +86,6 @@ class TabView(GTabView):
 
         _ns_tabview.removeTabViewItem_(_ns_tabview.tabViewItems()[i])
 
-    def tabView_didSelectTabViewItem_(self, tabview, item):
-        self.tab_changed(tabview.indexOfTabViewItem_(item))
-
     def get_selected_index(self):
         _ns_tabview = self._ns_view
 
@@ -103,7 +100,7 @@ class TabView(GTabView):
         _ns_tabview = self._ns_view
 
         if index < 0:
-            _nstabview.selectTabViewItem_(None)
+            _ns_tabview.selectTabViewItem_(None)
         else:
             _ns_tabview.selectTabViewItemAtIndex_(index)
 
@@ -136,5 +133,9 @@ class PyGUI_NSTabView(NSTabView, PyGUI_NS_EventHandler):
 
     def viewDidEndLiveResize(self):
         self.setNeedsDisplay_(True)
+
+    def tabView_didSelectTabViewItem_(self, tabview, item):
+        if self.pygui_component:
+            self.pygui_component.tab_changed(tabview.indexOfTabViewItem_(item))
 
 export(TabView)

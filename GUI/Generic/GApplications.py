@@ -17,7 +17,7 @@ class Application(Properties, MessageHandler):
     """The user should create exactly one Application object,
     or subclass thereof. It implements the main event loop
     and other application-wide behaviour."""
-    
+
     _windows = None				# List of all existing Windows
     _documents = None			# List of all existing Documents
     _menus = None					# Menus to appear in all Windows
@@ -34,16 +34,16 @@ class Application(Properties, MessageHandler):
 
     menus = overridable_property('menus',
         """A list of Menus that are to be available from all Windows.""")
-    
+
     open_file_types = overridable_property('open_file_types',
         """List of FileTypes openable by the default Open... command.""")
-    
+
     save_file_type = overridable_property('save_file_type',
         """Default FileType for Documents that do not specify their own.""")
-    
+
     file_type = overridable_property('file_type',
         """Write only. Sets open_file_types and save_file_type.""")
-    
+
     target = overridable_property('target',
         """Current target for key events and menu messages.""")
 
@@ -66,7 +66,7 @@ class Application(Properties, MessageHandler):
         self._page_setup = None
         Globals._application = self
         self._quit_flag = False
-    
+
     def destroy(self):
         Globals._application = None
 
@@ -76,10 +76,10 @@ class Application(Properties, MessageHandler):
 
 #	def get_std_menus(self):
 #		"""Returns a list of Menus containing the standard
-#		framework-defined menu commands in their standard 
+#		framework-defined menu commands in their standard
 #		positions."""
 #		return basic_menus()
-#	
+#
 #	std_menus = property(get_std_menus)
 
     #
@@ -88,10 +88,10 @@ class Application(Properties, MessageHandler):
 
     def get_windows(self):
         return self._windows
-    
+
     def get_documents(self):
         return self._documents
-    
+
     def get_menus(self):
         menus = self._menus
         if menus is None:
@@ -103,20 +103,20 @@ class Application(Properties, MessageHandler):
 
     def get_open_file_types(self):
         return self._open_file_types
-    
+
     def set_open_file_types(self, x):
         self._open_file_types = x
-    
+
     def get_save_file_type(self):
         return self._save_file_type
-    
+
     def set_save_file_type(self, x):
         self._save_file_type = x
-    
+
     def set_file_type(self, x):
         self._open_file_types = [x]
         self._save_file_type = x
-    
+
     def get_page_setup(self):
         #  This property is initialised lazily, because on Windows it turn out
         #  that calling PageSetupDlg() before the application's first window is
@@ -126,7 +126,7 @@ class Application(Properties, MessageHandler):
             ps = PageSetup()
             self._page_setup = ps
         return ps
-    
+
     def set_page_setup(self, x):
         self._page_setup = x
 
@@ -152,18 +152,18 @@ class Application(Properties, MessageHandler):
                 raise
             except:
                 self.report_error()
-    
+
     def _quit(self):
         #  Causes the main event loop to exit.
         self._quit_flag = True
         self._exit_event_loop()
-    
+
     def event_loop(self):
         """Loop reading and handling events until exit_event_loop() is called."""
         #  Implementations may override this together with exit_event_loop() to
         #  implement non-modal event loops in a different way.
         self._event_loop(None)
-    
+
     def _event_loop(self, modal_window):
         #  Generic modal and non-modal event loop.
         #  Loop reading and handling events for the given window, or for all
@@ -183,16 +183,16 @@ class Application(Properties, MessageHandler):
                     pass
         finally:
             self._exit_event_loop_flag = save
-    
+
     def exit_event_loop(self):
         """Cause the current call to event_loop() or modal_event_loop()
         to exit."""
         self._exit_event_loop()
-    
+
     def _exit_event_loop(self):
         #  Exit the generic _event_loop implementation.
         self._exit_event_loop_flag = True
-    
+
 #	def event_loop_until(self, exit):
 #		"""Loop reading and handling events until exit() returns
 #		true, _quit_flag is set or an exception other than Cancel
@@ -207,9 +207,9 @@ class Application(Properties, MessageHandler):
 #		"""Handle events until an exception occurs. Waits for at least one event;
 #		may handle more, at the discretion of the implementation."""
 #		self.handle_next_event()
-    
+
     def handle_next_event(self, modal_window):
-        #  Wait for the next event to arrive and handle it. Transparently handles 
+        #  Wait for the next event to arrive and handle it. Transparently handles
         #  any internal events such as window updates, etc., and executes any idle
         #  tasks that become due while waiting for an event. If modal_window is
         #  not None, restrict interaction to that window (but allow use of enabled
@@ -218,7 +218,7 @@ class Application(Properties, MessageHandler):
         #  This only needs to be implemented if the generic _event_loop() is being
         #  used.
         raise UnimplementedMethod(self, "handle_next_event")
-    
+
     #
     #		Menu commands
     #
@@ -248,7 +248,7 @@ class Application(Properties, MessageHandler):
             self.open_fileref(fileref)
         else:
             raise Cancel
-    
+
     def get_default_open_directory(self):
         """Called by the default implementation of open_cmd() to find an initial
         directory for request_old_file(). Should return a DirRef or FileRef, or
@@ -256,7 +256,7 @@ class Application(Properties, MessageHandler):
         directory in which a document was opened or saved during this session,
         if any."""
         return self._last_directory
-    
+
     def page_setup_cmd(self):
         present_page_setup_dialog(self.page_setup)
 
@@ -275,7 +275,7 @@ class Application(Properties, MessageHandler):
     #
     #   Opening files
     #
-    
+
     def process_args(self, args):
         """Process command line arguments. Called by run() when the application
         is starting up."""
@@ -286,16 +286,16 @@ class Application(Properties, MessageHandler):
                 if os.path.exists(arg):
                     arg = os.path.abspath(arg)
                     self.open_path(arg)
-    
+
     def open_app(self):
         """Called by run() when the application is opened with no arguments."""
         pass
-    
+
     def open_path(self, path):
         """Open document specified by a pathname. Called for each command line
         argument when the application is starting up."""
         self.open_fileref(FileRef(path = path))
-    
+
     def open_fileref(self, fileref):
         """Open document specified by a FileRef."""
         doc = self.make_file_document(fileref)
@@ -312,24 +312,24 @@ class Application(Properties, MessageHandler):
     #
     #   Message dispatching
     #
-    
+
 #	def dispatch(self, message, *args):
 #		target_window = self._find_target_window()
 #		if target_window:
 #			target_window.dispatch(message, *args)
 #		else:
 #			self.handle(message, *args)
-    
+
     def dispatch(self, message, *args):
         self.target.handle(message, *args)
-    
+
     def dispatch_menu_command(self, command):
         if isinstance(command, tuple):
             name, index = command
             self.dispatch(name, index)
         else:
             self.dispatch(command)
-    
+
     def get_target(self):
         #  Implementations may override this to locate the target in a
         #  different way if they choose not to implement the Window.target
@@ -343,23 +343,23 @@ class Application(Properties, MessageHandler):
     def get_target_window(self):
         """Return the window to which messages should be dispatched, or None."""
         raise NotImplementedError
-    
+
     #
     #		Abstract
     #
 
     def make_new_document(self):
-        """Create a new Document object of the appropriate 
+        """Create a new Document object of the appropriate
         class in response to a New command."""
         return self.make_document(None)
 
     def make_file_document(self, fileref):
-        """Create a new Document object of the appropriate 
+        """Create a new Document object of the appropriate
         class for the given FileRef."""
         return self.make_document(fileref)
-    
+
     def make_document(self, fileref):
-        """Should create a new Document object of the appropriate 
+        """Should create a new Document object of the appropriate
         class for the given FileRef, or if FileRef is None, a new
         empty Document of the appropriate class for the New command."""
         return None
@@ -376,21 +376,21 @@ class Application(Properties, MessageHandler):
     def query_clipboard(self):
         "Tests whether the clipboard contains any data."
         return not not self._clipboard
-    
+
     def get_clipboard(self):
         return self._clipboard
 
     def set_clipboard(self, x):
         self._clipboard = x
-    
+
     #
     #   Window list management
     #
-    
+
     def _add_window(self, window):
         if window not in self._windows:
             self._windows.append(window)
-    
+
     def _remove_window(self, window):
         if window in self._windows:
             self._windows.remove(window)
@@ -398,22 +398,24 @@ class Application(Properties, MessageHandler):
     #
     #   Document list management
     #
-    
+
     def _add_document(self, doc):
         if doc not in self._documents:
             self._documents.append(doc)
-    
+
     def _remove_document(self, doc):
         if doc in self._documents:
             self._documents.remove(doc)
-    
+
     #
     #   Exception reporting
     #
-    
+
     def report_error(self):
         """Display an appropriate error message for the most recent
         exception caught."""
+        import traceback
+        traceback.print_stack()
         try:
             raise
         except Cancel:
@@ -452,7 +454,7 @@ class Application(Properties, MessageHandler):
             print >>sys.stderr, "------------------ Original exception -------------------"
             traceback.print_exception(exc_type, exc_val, exc_tb)
             #os._exit(1)
-    
+
     def display_traceback(self, exc_desc, exc_tb):
         """Display an exception description and traceback.
         TODO: display this in a scrolling window."""
@@ -468,15 +470,15 @@ class Application(Properties, MessageHandler):
     #
     #   Other
     #
-    
+
     def zero_windows_allowed(self):
         """Platforms should implement this to return false if there
-        must be at least one window open at all times. Returning false 
-        here forces the Quit command to be used instead of Close when 
+        must be at least one window open at all times. Returning false
+        here forces the Quit command to be used instead of Close when
         there is only one window open."""
         # TODO: Move this somewhere more global.
         raise UnimplementedMethod(self, 'zero_windows_allowed')
-    
+
     def _perform_menu_setup(self, menus = None):
         """Given a list of Menu objects, perform menu setup processing
         and update associated platform menus ready for popping up or
@@ -488,7 +490,7 @@ class Application(Properties, MessageHandler):
         self._dispatch_menu_setup(menu_state)
         for menu in menus:
             menu._update_platform_menu()
-    
+
     def _dispatch_menu_setup(self, menu_state):
         self.dispatch('_setup_menus', menu_state)
 
@@ -498,7 +500,7 @@ class Application(Properties, MessageHandler):
         in an appropriate order according to platform conventions."""
         window = self.target_window
         return self._effective_menus_for_window(window)
-    
+
     def _effective_menus_for_window(self, window):
         """Return a list of the menus in effect for the specified
         window, including both application-wide and window-specific menus,
@@ -548,6 +550,6 @@ class Application(Properties, MessageHandler):
 
     def schedule_idle(self, callback, *args):
         callback(*args)
-    
+
     def schedule_timeout(self, interval, callback, *args):
         calback(*args)
