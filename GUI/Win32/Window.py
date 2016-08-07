@@ -6,7 +6,7 @@
 
 import win32con as wc, win32ui as ui, win32gui as gui, win32api as api
 from GUI import export
-from GUI import WinUtils 
+from GUI import WinUtils
 from GUI.Geometry import rect_size, sub_pt
 from GUI import application
 from GUI.Exceptions import Cancel
@@ -118,7 +118,7 @@ class Window(GWindow):
             self._win_set_empty_menubar()
         kwds['closable'] = flags & wc.WS_CAPTION <> 0
         GWindow.__init__(self, _win = frame, **kwds)
-    
+
     def OnPaint(self):
         win = self._win
         dc, ps = win.BeginPaint()
@@ -130,13 +130,13 @@ class Window(GWindow):
                 WinUtils.win_color3dshadow, WinUtils.win_color3dhilight)
         win.EndPaint(ps)
 
-    def _win_install_event_hooks(self): 
+    def _win_install_event_hooks(self):
         self._win.HookMessage(self._wm_activate, wc.WM_ACTIVATE)
         #self._win.HookMessage(self._wm_setfocus, wc.WM_SETFOCUS)
         self._win.HookMessage(self._wm_windowposchanging, wc.WM_WINDOWPOSCHANGING)
         self._win.HookMessage(self._wm_windowposchanged, wc.WM_WINDOWPOSCHANGED)
         GWindow._win_install_event_hooks(self)
-    
+
     def _wm_activate(self, msg):
         wParam = msg[2]
         #print "Window._wm_activate:", msg ###
@@ -162,7 +162,7 @@ class Window(GWindow):
             self._win_saved_target = None
         else:
             GWindow._win_wm_setfocus(self, msg)
-    
+
     def get_target(self):
         if self._win_is_active():
             try:
@@ -172,7 +172,7 @@ class Window(GWindow):
             if target and isinstance(target, Component):
                 return target
         return self._saved_target or self
-    
+
     def _win_is_active(self):
         try:
             active_win = ui.GetActiveWindow()
@@ -187,7 +187,7 @@ class Window(GWindow):
         #print "Window._wm_windowposchanging"
         self._win_old_size = rect_size(self._bounds)
         #print "...old size =", self._win_old_size
-    
+
     def _wm_windowposchanged(self, message):
         #print "Window._wm_windowposchanged"
         old_size = self._win_old_size
@@ -197,7 +197,7 @@ class Window(GWindow):
         #print "...new size =", new_size
         if old_size != new_size:
             self._resized(sub_pt(new_size, old_size))
-    
+
     def _win_set_empty_menubar(self):
         #  A completely empty menu bar collapses to zero height, and
         #  controlling the window bounds is too complicated if the
@@ -206,16 +206,16 @@ class Window(GWindow):
         menubar.win_menu.AppendMenu(0, 0, "")
         self._win.SetMenu(menubar.win_menu)
         self._win_menubar = menubar
-    
+
     def get_title(self):
         return self._win.GetWindowText()
-    
+
     def set_title(self, x):
         self._win.SetWindowText(x)
 
     def get_visible(self):
         return self._win.IsWindowVisible()
-    
+
     def set_visible(self, x):
         #print "Window.set_visible:", x, self ###
         if x:
@@ -223,7 +223,7 @@ class Window(GWindow):
             self._win.ShowWindow()
         else:
             self._win.ShowWindow(wc.SW_HIDE)
-    
+
     def _show(self):
         self._win_update_menubar()
         win = self._win
@@ -233,7 +233,7 @@ class Window(GWindow):
 #			wc.SWP_NOMOVE | wc.SWP_NOSIZE | wc.SWP_SHOWWINDOW)
         win.ShowWindow(wc.SW_SHOWNORMAL)
         win.SetActiveWindow()
-    
+
 #	def get_bounds(self):
 #		win = self._win
 #		r = win.ClientToScreen(win.GetClientRect())
@@ -242,14 +242,14 @@ class Window(GWindow):
     def _win_get_actual_bounds(self):
         win = self._win
         return win.ClientToScreen(win.GetClientRect())
-    
+
     def _win_move_window(self, rect):
         win = self._win
         l, t, r, b = win.CalcWindowRect(rect)
         if self._win_has_menubar:
             t -= WinUtils.win_menubar_height
         self._win.MoveWindow((l, t, r, b))
-    
+
     def set_menus(self, x):
         GWindow.set_menus(self, x)
         self._win_menus_changed()
@@ -274,12 +274,12 @@ class Window(GWindow):
             pass
         except:
             application().report_error()
-        
+
     def _win_menus_changed(self):
         self._win_need_menubar_update = True
         if self.visible:
             self._win_update_menubar()
-    
+
     def _win_update_menubar(self):
         #print "Window._win_update_menubar:", self ###
         if self._win_need_menubar_update:
@@ -295,30 +295,30 @@ class Window(GWindow):
                 else:
                     self._win_set_empty_menubar()
             self._win_need_menubar_update = False
-    
+
     def _win_wm_initmenu(self, message):
         #print "Window._win_wm_initmenu:", self ###
         self._win_perform_menu_setup()
-    
+
     def _win_perform_menu_setup(self):
         #print "Window._win_perform_menu_setup:", self ###
         application()._perform_menu_setup(self._all_menus)
-    
+
     def _win_menu_command(self, id):
         command = win_id_to_command(id)
         if command:
             application().dispatch_menu_command(command)
-    
+
     def _win_possible_menu_key(self, key, shift, option):
         self._win_perform_menu_setup()
         command = search_list_for_key(self._all_menus, key, shift, option)
         if command:
             application().dispatch_menu_command(command)
             return True
-    
+
     def _screen_rect(self):
         return WinUtils.win_screen_rect
-    
+
     def modal_event_loop(self):
         disabled = []
         for window in application().windows:
@@ -336,7 +336,7 @@ class Window(GWindow):
         if status <> 0: ###
             from GUI.Exceptions import InternalError ###
             raise InternalError("RunModalLoop returned %s" % status) ###
-    
+
     def exit_modal_event_loop(self):
         self._win.EndModalLoop(0)
 

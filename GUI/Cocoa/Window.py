@@ -168,6 +168,24 @@ class Window(GWindow):
     def _document_needs_saving(self, state):
         self._ns_window.setDocumentEdited_(state)
 
+    def modal_event_loop(self):
+        _ns_app = application()._ns_app
+
+        _ns_app.beginSheet_modalForWindow_modalDelegate_didEndSelector_contextInfo_(
+            self._ns_window,
+            self._parent_window._ns_window if self._parent_window else None,
+            None,
+            None,
+            None)
+
+        _ns_app.runModalForWindow_(self._ns_window)
+
+        _ns_app.endSheet_(self._ns_window)
+
+    def exit_modal_event_loop(self):
+        _ns_app = application()._ns_app
+
+        _ns_app.stopModal()
 #------------------------------------------------------------------------------
 
 class PyGUI_NSWindow(NSWindow, PyGUI_NS_EventHandler):

@@ -8,11 +8,13 @@ from GUI import Dialog
 class ModalDialog(Dialog):
 
     def __init__(self, style = 'modal_dialog', **kwds):
+        self._parent_window = None
         Dialog.__init__(self, style = style, **kwds)
 
-    def present(self):
+    def present(self, parentWindow = None):
         self._result = None
         self._dismissed = 0
+        self._parent_window = parentWindow
         self.show()
         app = application()
         try:
