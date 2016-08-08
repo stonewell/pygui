@@ -10,7 +10,7 @@ function_names = [
     'request_old_files',
     'request_new_file',
     'request_old_directory',
-    'request_old_directories', 
+    'request_old_directories',
     'request_new_directory',
 ]
 for name in function_names:
@@ -18,7 +18,7 @@ for name in function_names:
         functions[name] = getattr(FileDialogs, name)
     else:
         say("*** Missing function:", name)
-    
+
 last_dir = DirRef(path = os.path.abspath(os.path.dirname(sys.argv[0])))
 last_name = ""
 
@@ -64,10 +64,10 @@ class TestWindow(Window):
             elif isinstance(result, DirRef):
                 say("Setting last_dir to", result) ###
                 last_dir = result
-    
+
     #def multiple(self):
     #	return self.multi.on
-    
+
     def do_old_file(self):
         say("Doing request_old_file")
         if self.filt.on:
@@ -77,7 +77,7 @@ class TestWindow(Window):
         result = FileDialogs.request_old_file("Open Dusty Old File:",
             default_dir = last_dir, file_types = file_types)
         self.save_result(result)
-    
+
     def do_old_files(self):
         say("Doing request_old_files")
         if self.filt.on:
@@ -87,19 +87,19 @@ class TestWindow(Window):
         result = FileDialogs.request_old_files("Open Dusty Old Files:",
             default_dir = last_dir, file_types = file_types)
         self.save_result(result)
-    
+
     def do_old_dir(self):
         say("Doing request_old_directory")
         result = FileDialogs.request_old_directory("Open Mouldy Old Directory:",
             default_dir = last_dir)
         self.save_result(result)
-    
+
     def do_old_dirs(self):
         say("Doing request_old_directories")
         result = FileDialogs.request_old_directories("Open Mouldy Old Directories:",
             default_dir = last_dir)
         self.save_result(result)
-    
+
     def do_new_file(self):
         say("Doing request_new_file with default_dir = %s, default_name = %r"
             % (last_dir, last_name))
