@@ -22,6 +22,27 @@ win_style = wc.WS_VISIBLE | wc.WS_CLIPCHILDREN | wc.WS_CLIPSIBLINGS
 win_default_size = GGLView._default_size
 win_default_rect = (0, 0, win_default_size[0], win_default_size[1])
 
+wgl.PFD_TYPE_RGBA =       0
+wgl.PFD_TYPE_COLORINDEX = 1
+wgl.PFD_MAIN_PLANE =      0
+wgl.PFD_OVERLAY_PLANE =   1
+wgl.PFD_UNDERLAY_PLANE =  (-1)
+wgl.PFD_DOUBLEBUFFER =           0x00000001
+wgl.PFD_STEREO =                 0x00000002
+wgl.PFD_DRAW_TO_WINDOW =         0x00000004
+wgl.PFD_DRAW_TO_BITMAP =         0x00000008
+wgl.PFD_SUPPORT_GDI =            0x00000010
+wgl.PFD_SUPPORT_OPENGL =         0x00000020
+wgl.PFD_GENERIC_FORMAT =         0x00000040
+wgl.PFD_NEED_PALETTE =           0x00000080
+wgl.PFD_NEED_SYSTEM_PALETTE =    0x00000100
+wgl.PFD_SWAP_EXCHANGE =          0x00000200
+wgl.PFD_SWAP_COPY =              0x00000400
+wgl.PFD_SWAP_LAYER_BUFFERS =     0x00000800
+wgl.PFD_GENERIC_ACCELERATED =    0x00001000
+wgl.PFD_DEPTH_DONTCARE =         0x20000000
+wgl.PFD_DOUBLEBUFFER_DONTCARE =  0x40000000
+wgl.PFD_STEREO_DONTCARE =        0x80000000
 #------------------------------------------------------------------------------
 
 class GLConfig(GGLConfig):
@@ -96,8 +117,8 @@ class GLConfig(GGLConfig):
             raise GLConfigError("Stereo buffer not available")
         if self._aux_buffers and pf.cAuxBuffers == 0:
             raise GLConfigError("Auxiliary buffers not available")
-        if self._depth_buffer and pf.cDepthBits == 0:
-            raise GLConfigError("Depth buffer not available")
+        #if self._depth_buffer and pf.cDepthBits == 0:
+        #    raise GLConfigError("Depth buffer not available")
         if self._stencil_buffer and pf.cStencilBits == 0:
             raise GLConfigError("Stencil buffer not available")
         if self.accum_buffer and pf.cAccumBits == 0:
@@ -112,8 +133,12 @@ class GLConfig(GGLConfig):
         ipf = wgl.ChoosePixelFormat(hdc, reqpf)
         #print "... result =", ipf ###
         actpf = wgl.PIXELFORMATDESCRIPTOR()
+        actpf.dwFlags = reqpf.dwFlags
+
         #print "GLConfig: Describing pixel format", ipf, "for hdc", hdc ###
         wgl.DescribePixelFormat(hdc, ipf, actpf.nSize, actpf)
+        actpf.cAlphaBits = reqpf.cAlphaBits
+
         #print "Actual format:" ###
         #win_dump_pixelformat(actpf) ###
         return ipf, actpf
@@ -249,8 +274,8 @@ def win_dump_pixelformat(pf):
     print "cAccumRedBits =", pf.cAccumRedBits
     print "cAccumGreenBits =", pf.cAccumGreenBits
     print "cAccumBlueBits =", pf.cAccumBlueBits
-    print "cDepthBits =", pf.cDepthBits
-    print "cStencilBits =", pf.cStencilBits
+    #print "cDepthBits =", pf.cDepthBits
+    #print "cStencilBits =", pf.cStencilBits
     print "cAuxBuffers =", pf.cAuxBuffers
     print "iLayerType =", pf.iLayerType
     print "bReserved =", pf.bReserved

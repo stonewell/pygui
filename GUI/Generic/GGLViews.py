@@ -30,8 +30,8 @@ class GLView(ViewBase, Component, GLContext):
         Component.destroy(self)
     
     def _render(self):
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
+        #glMatrixMode(GL_MODELVIEW)
+        #glLoadIdentity()
         self.render()
     
     def render(self):
@@ -68,6 +68,10 @@ class GLView(ViewBase, Component, GLContext):
     
     def _update_viewport(self):
         width, height = self.size
+
+        if width <= 0 or height <= 0:
+            return
+        
         glViewport(0, 0, int(width), int(height))
         self.viewport_changed()
         
