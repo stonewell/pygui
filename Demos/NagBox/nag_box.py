@@ -10,10 +10,10 @@ class NagBox(ModalDialog):
         self.place(self.ok_button, top = label + 20, right = label.right)
         self.shrink_wrap(padding = (20, 20))
         self.timer = Task(self.enable_button, timeout)
-    
+
     def enable_button(self):
         self.ok_button.enabled = True
-    
+
     def ok(self):
         self.dismiss(True)
 

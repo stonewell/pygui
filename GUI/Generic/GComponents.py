@@ -30,30 +30,30 @@ class Component(Properties, MessageHandler):
     top = overridable_property('top', "Position of top edge relative to container.")
     right = overridable_property('right', "Position of right edge relative to container.")
     bottom = overridable_property('bottom', "Position of bottom edge relative to container.")
-    
+
     x = overridable_property('x', "Horizontal position relative to container.")
     y = overridable_property('y', "Vertical position relative to container.")
     width = overridable_property('width')
     height = overridable_property('height')
-    
+
     position = overridable_property('position', "Position relative to container.")
     size = overridable_property('size')
-    
+
     bounds = overridable_property('bounds', "Bounding rectangle in container's coordinates.")
-    
+
     container = overridable_property('container',
         "Container which contains this Component. Setting this property has the "
         "effect of removing the component from its previous container, if any, "
         "and adding it to the new one, if any.")
-    
+
 #	visible = overridable_property('visible',
-#		"Whether the component is currently shown.")	
+#		"Whether the component is currently shown.")
 
     tab_stop = overridable_property('tab_stop',
         "Whether tab key can navigate into this control.")
-    
+
     anchor = overridable_property('anchor', "A string of 'ltrb' controlling behaviour when container is resized.")
-    
+
     border = overridable_property('border', "True if the component should have a border.")
 
     _is_scrollable = False  #  Overridden by scrollable subclasses
@@ -121,7 +121,7 @@ class Component(Properties, MessageHandler):
 
     def get_bottom(self):
         return self.bounds[3]
-    
+
     def set_bottom(self, v):
         l, t, r, b = self.bounds
         self.bounds = (l, t, r, v)
@@ -139,11 +139,11 @@ class Component(Properties, MessageHandler):
     def set_y(self, v):
         l, t, r, b = self.bounds
         self.bounds = (l, v, r, v + b - t)
-    
+
     def get_position(self):
         l, t, r, b = self.bounds
         return (l, t)
-    
+
     def set_position(self, (x, y)):
         l, t, r, b = self.bounds
         self.bounds = (x, y, x + r - l, y + b - t)
@@ -151,7 +151,7 @@ class Component(Properties, MessageHandler):
     def get_width(self):
         l, t, r, b = self.bounds
         return r - l
-    
+
     def set_width(self, v):
         l, t, r, b = self.bounds
         self.bounds = (l, t, l + v, b)
@@ -159,30 +159,30 @@ class Component(Properties, MessageHandler):
     def get_height(self):
         l, t, r, b = self.bounds
         return b - t
-    
+
     def set_height(self, v):
         l, t, r, b = self.bounds
         self.bounds = (l, t, r, t + v)
-    
+
     def get_size(self):
         l, t, r, b = self.bounds
         return (r - l, b - t)
-    
+
     def set_size(self, (w, h)):
         l, t, r, b = self.bounds
         self.bounds = (l, t, l + w, t + h)
-    
+
     #
     #  Container management
     #
-    
+
     def get_container(self):
         return self._container
-     
+
     def set_container(self, new_container):
         if self._container != new_container:
             self._change_container(new_container)
-    
+
     def _change_container(self, new_container):
         old_container = self._container
         if old_container:
@@ -191,7 +191,7 @@ class Component(Properties, MessageHandler):
         if new_container:
             self._container = new_container
             new_container._add(self)
-    
+
     #
     #   Message dispatching
     #
@@ -207,11 +207,11 @@ class Component(Properties, MessageHandler):
         Window. If the component is not contained in a Window, the result
         is undefined."""
         return self.window and self.window.target is self
-    
+
     #
     #		Message handling
     #
-    
+
     def next_handler(self):
         return self._container
 
@@ -230,17 +230,17 @@ class Component(Properties, MessageHandler):
     #
     #   Border
     #
-    
+
     def get_border(self):
         return self._border
-    
+
     def set_border(self, x):
         self._border = x
-    
+
     #
     #		Resizing
     #
-    
+
     def get_anchor(self):
         if self.hmove:
             s1 = 'r'
@@ -255,7 +255,7 @@ class Component(Properties, MessageHandler):
         else:
             s2 = 't'
         return s1 + s2
-    
+
     def set_anchor(self, s):
         if 'r' in s:
             if 'l' in s:
@@ -277,13 +277,13 @@ class Component(Properties, MessageHandler):
         else:
             self.vstretch = False
             self.vmove = False
-    
+
     def get_auto_layout(self):
         return self._auto_layout
-    
+
     def set_auto_layout(self, x):
         self._auto_layout = x
-    
+
     def _resized(self, delta):
         #  Called whenever the size of the component changes for
         #  any reason.
@@ -307,7 +307,7 @@ class Component(Properties, MessageHandler):
         elif self.vstretch:
             bottom += dh
         self.bounds = (left, top, right, bottom)
-    
+
     #
     #		Update region maintenance
     #
@@ -315,13 +315,13 @@ class Component(Properties, MessageHandler):
     def invalidate(self):
         """Mark the whole Component as needing to be redrawn."""
         self.invalidate_rect(self.viewed_rect())
-    
+
 #	def invalidate_rect(self, r):
 #		print "GComponent.invalidate_rect:", self, r ###
 #		container = self._container
 #		if container:
 #			container.invalidate_rect(r)
-    
+
 #	def _invalidate_in_container(self):
 #		container = self._container
 #		if container:
@@ -344,13 +344,13 @@ class Component(Properties, MessageHandler):
         if parent:
             p = parent.global_to_local(p)
         return self.container_to_local(p)
-    
+
     def local_to_container(self, p):
         if self._has_local_coords:
             return add_pt(p, self.local_to_container_offset())
         else:
             return p
-    
+
     def container_to_local(self, p):
         if self._has_local_coords:
             return sub_pt(p, self.local_to_container_offset())
@@ -362,38 +362,38 @@ class Component(Properties, MessageHandler):
             return self.position
         else:
             return (0, 0)
-    
+
     def transform_from(self, other, p):
         return transform_coords(other, self, p)
-    
+
     def transform_to(self, other, p):
         return transform_coords(self, other, p)
 
     #
     #   Placement specification support
     #
-    
+
     def __add__(self, offset):
         return (self, offset)
-    
+
     def __sub__(self, offset):
         return (self, -offset)
-    
+
     #
     #   Tabbing
     #
-    
+
 #	def get_tabbable(self):
 #		return self._tabbable
-#	
+#
 #	def set_tabbable(self, value):
 #		if self._tabbable <> value:
 #			self._tabbable = value
 #			self._invalidate_tab_chain()
-    
+
     def get_tab_stop(self):
         return self._tab_stop
-    
+
     def set_tab_stop(self, x):
         if self._tab_stop <> x:
             self._tab_stop = x
@@ -410,29 +410,29 @@ class Component(Properties, MessageHandler):
 
     def _tab_out(self):
         pass
-    
+
     def _tab_in(self):
         self.become_target()
-    
+
     def _build_tab_chain(self, chain):
         if self._tab_stop:
             chain.append(self)
-    
+
     def _invalidate_tab_chain(self):
         window = self.window
         if window:
             window._invalidate_tab_chain()
-    
+
     def _is_targetable(self):
         return True
 
     #
     #		Other
     #
-    
+
     window = overridable_property('window', """The Window ultimately containing
         this Component, or None.""")
-    
+
     def get_window(self):
         container = self._container
         if container:
@@ -442,7 +442,7 @@ class Component(Properties, MessageHandler):
 
     def reset_blink(self):
         application().reset_blink()
-    
+
     def viewed_rect(self):
         """Returns the rectangle in local coordinates that is
         currently visible within the component."""
@@ -451,7 +451,7 @@ class Component(Properties, MessageHandler):
             return (0, 0, width, height)
         else:
             return self.bounds
-    
+
     def broadcast(self, message, *args):
         """Traverse the component hierarchy, calling each component's handler for
         the given message, if any."""
@@ -461,7 +461,7 @@ class Component(Properties, MessageHandler):
 
     def _dispatch_mouse_event(self, event):
         self._handle_mouse_event(event)
-    
+
     def _handle_mouse_event(self, event):
         self.handle(event.kind, event)
 

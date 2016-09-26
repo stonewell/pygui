@@ -8,14 +8,14 @@ from GUI import Component, Container
 
 class TabView(Container):
     """ A tabview."""
-    
+
     selected_index = overridable_property('selected_index',
         "selected tab item")
     items = overridable_property('items', "tab view items")
 
     def __init__(self, **kwargs):
         Container.__init__(self, **kwargs)
-        
+
     def add_item(self, v, title = None):
         self.add(v)
 
@@ -39,4 +39,3 @@ class TabView(Container):
 
     def set_selected_index(self, index):
         raise NotImplementedError
-        

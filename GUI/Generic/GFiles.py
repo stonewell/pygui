@@ -21,7 +21,7 @@ class FileRef(Properties):
     It consists of two parts, a directory specification and the name of an
     object within that directory. The directory specification always refers
     to an existing directory, but the named object may or may not exist.
-    
+
     Constructors:
         FileRef(dir = DirRef or path, name = string)
         FileRef(path = string)
@@ -33,11 +33,11 @@ class FileRef(Properties):
 
     _dir = None		# DirRef representing the parent directory
     _name = None	# Name, including type suffix if any
-    
+
     #
     #   Constructor
     #
-    
+
     def __init__(self, dir = None, name = None, path = None):
         if dir and name and not path:
             if not isinstance(dir, DirRef):
@@ -77,12 +77,12 @@ class FileRef(Properties):
         if "w" in mode and file_type:
             self._set_type(file_type)
         return f
-    
+
     def mkdir(self):
         """Create a directory with the name and parent directory specified
         by this FileRef. Returns a DirRef for the created directory."""
         return DirRef(os.mkdir(self.path))
-    
+
     def _set_type(self, file_type):
         #  Platforms which have file-type metadata (e.g. Macintosh) use this
         #  to set the type of a file.
@@ -97,7 +97,7 @@ class DirRef(Properties):
     """A DirRef is an object representing a directory in the
     file system. Its representation is completely platform
     dependent.
-    
+
     Constructor:
         DirRef(path = string)
     """
@@ -105,7 +105,7 @@ class DirRef(Properties):
     _path = None
 
     path = overridable_property('path', "Full pathname of the directory.")
-    
+
     def __init__(self, path):
         self._path = path
 
@@ -119,46 +119,46 @@ class DirRef(Properties):
 
 class FileType(Properties):
     """A FileType is a multi-platform representation of a file type."""
-    
+
     _name = None
     _suffix = None
     _mac_creator = None
     _mac_type = None
     _mac_force_suffix = True
-    
+
     name = overridable_property('name', "Human-readable description of the file type")
     suffix = overridable_property('suffix', "Filename suffix (without dot)")
     mac_creator = overridable_property('mac_creator', "Macintosh 4-character creator code")
     mac_type = overridable_property('mac_type', "Macintosh 4-character type code")
     mac_force_suffix = overridable_property('mac_force_suffix', "Enforce filename suffix on MacOSX")
-    
+
     def get_name(self):
         return self._name
-    
+
     def set_name(self, x):
         self._name = x
-    
+
     def get_suffix(self):
         return self._suffix
-    
+
     def set_suffix(self, x):
         self._suffix = x
-    
+
     def get_mac_creator(self):
         return self._mac_creator
-    
+
     def set_mac_creator(self, x):
         self._mac_creator = x
 
     def get_mac_type(self):
         return self._mac_type
-    
+
     def set_mac_type(self, x):
         self._mac_type = x
-    
+
     def get_mac_force_suffix(self):
         return self._mac_force_suffix
-    
+
     def set_mac_force_suffix(self, x):
         self._mac_force_suffix = x
 
@@ -175,7 +175,7 @@ class FileType(Properties):
         if this_suffix and _matches_suffix(name, this_suffix):
             return True
         return False
-    
+
     def _add_suffix(self, name):
         #  Force the given name to have the appropriate suffix for this file
         #  type. Platforms which have other means of representing file types
@@ -184,7 +184,7 @@ class FileType(Properties):
         if suffix and not _matches_suffix(name, suffix):
             name = "%s.%s" % (name, suffix)
         return name
-    
+
 #-------------------------------------------------------------------------
 
 def _matches_suffix(name, suffix):

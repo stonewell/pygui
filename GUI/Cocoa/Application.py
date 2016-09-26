@@ -32,7 +32,7 @@ class Application(GApplication):
     #  _ns_app          _PyGui_NSApplication
     #  _ns_pasteboard   NSPasteboard
     #  _ns_key_window   Window
-    
+
     _ns_menubar_update_pending = False
     _ns_files_opened = False
     _ns_using_clargs = False
@@ -45,7 +45,7 @@ class Application(GApplication):
         self._ns_key_window = None
         GApplication.__init__(self, **kwds)
         self.ns_init_application_name()
-    
+
     def destroy(self):
         del self.menus[:]
         import Windows
@@ -54,11 +54,11 @@ class Application(GApplication):
         self._ns_app = None
         self._ns_pasteboard = None
         GApplication.destroy(self)
-    
+
     def set_menus(self, menu_list):
         GApplication.set_menus(self, menu_list)
         self._update_menubar()
-    
+
     def _update_menubar(self):
         ns_app = self._ns_app
         ns_menubar = NSMenu.alloc().initWithTitle_("")
@@ -96,7 +96,7 @@ class Application(GApplication):
             ns_window = ns_event.window()
             if not ns_window or not ns_modal_window or ns_window == ns_modal_window:
                 ns_app.sendEvent_(ns_event)
-    
+
     def get_target_window(self):
         #  NSApplication.keyWindow() isn't reliable enough. We keep track
         #  of the key window ourselves.
@@ -104,31 +104,31 @@ class Application(GApplication):
 
     def zero_windows_allowed(self):
         return 1
-    
+
     def query_clipboard(self):
         pb = self._ns_pasteboard
         pb_types = pb.types()
         return NSStringPboardType in pb_types
-    
+
     def get_clipboard(self):
         pb = self._ns_pasteboard
         ns_data = pb.dataForType_(NSStringPboardType)
         if ns_data:
             return ns_data.bytes().tobytes()
-    
+
     def set_clipboard(self, data):
         ns_data = NSData.dataWithBytes_length_(data, len(data))
         pb = self._ns_pasteboard
         pb.clearContents()
         pb.setData_forType_(ns_data, NSStringPboardType)
-    
+
     def setup_menus(self, m):
         m.hide_app_cmd.enabled = True
         m.hide_other_apps_cmd.enabled = True
         m.show_all_apps_cmd.enabled = True
         if not self._ns_app.modalWindow():
             GApplication.setup_menus(self, m)
-    
+
     def process_args(self, args):
         #  Note: When using py2app, argv_emulation should be disabled.
         if args and args[0].startswith("-psn"):
@@ -158,7 +158,7 @@ class Application(GApplication):
 
     def event_loop(self):
         self._ns_app.run()
-    
+
     def _quit(self):
         self._quit_flag = True
         self._ns_app.stop_(self._ns_app)
@@ -187,7 +187,7 @@ class Application(GApplication):
             else:
                 event = Event(ns_event)
                 self.handle(event.kind, event)
-    
+
     def ns_menu_needs_update(self, ns_menu):
         try:
             if not self._ns_menus_updated:
@@ -209,7 +209,7 @@ class Application(GApplication):
                     #print "GUI.Application: NSBundle infoDictionary =", ns_info ###
                     ns_info['CFBundleName'] = Globals.application_name
                 return
-    
+
 #------------------------------------------------------------------------------
 
 _ns_key_event_mask = AppKit.NSKeyDownMask | AppKit.NSKeyUpMask
@@ -255,10 +255,10 @@ class _PyGui_NSApplication(NSApplication):
                 dispatch_to_app(self, command)
         except:
             self.pygui_app.report_error()
-    
+
     def validateMenuItem_(self, item):
         return False
-    
+
     def undo_(self, sender):
         dispatch_to_app(self, 'undo_cmd')
 
@@ -295,7 +295,7 @@ class _PyGui_NSApplication(NSApplication):
         except Exception, e:
             app.report_error()
             return False
-    
+
     def applicationDidFinishLaunching_(self, notification):
         app = self.pygui_app
         if app._ns_using_clargs:

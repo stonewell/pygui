@@ -61,7 +61,7 @@ class Window(GWindow):
             _ns_view = ns_window.contentView(), _ns_responder = ns_window,
             _ns_set_autoresizing_mask = False,
             **kwds)
-    
+
     def _ns_window_style_mask(self, movable, closable, hidable, resizable):
         if movable or closable or hidable or resizable:
             mask = AppKit.NSTitledWindowMask
@@ -96,29 +96,34 @@ class Window(GWindow):
     def get_bounds(self):
         ns_window = self._ns_window
         ns_frame = ns_window.frame()
-        (l, y), (w, h) = ns_window.contentRectForFrameRect_styleMask_(
-            ns_frame, self._ns_style_mask)
+        ## (l, y), (w, h) = ns_window.contentRectForFrameRect_styleMask_(
+        ##     ns_frame, self._ns_style_mask)
+        (l, y), (w, h) = ns_window.contentRectForFrameRect_(
+            ns_frame)
         b = Globals.ns_screen_height - y
         result = (l, b - h, l + w, b)
+
         return result
-    
+
     def set_bounds(self, (l, t, r, b)):
         y = Globals.ns_screen_height - b
         ns_rect = NSRect(NSPoint(l, y), NSSize(r - l, b - t))
         ns_window = self._ns_window
-        ns_frame = ns_window.frameRectForContentRect_styleMask_(
-            ns_rect, self._ns_style_mask)
+        ## ns_frame = ns_window.frameRectForContentRect_styleMask_(
+        ##     ns_rect, self._ns_style_mask)
+        ns_frame = ns_window.frameRectForContentRect_(
+            ns_rect)
         ns_window.setFrame_display_(ns_frame, False)
 
     def get_title(self):
         return self._ns_window.title()
-    
+
     def set_title(self, v):
         self._ns_window.setTitle_(v)
 
     def get_visible(self):
         return self._ns_window.isVisible()
-    
+
     def set_visible(self, v):
         #  At some mysterious time between creating a window and showing
         #  it for the first time, Cocoa adjusts its position so that it
@@ -131,11 +136,11 @@ class Window(GWindow):
             self._ns_window.orderFront_(None)
         else:
             self._ns_window.orderOut_(None)
-    
+
     def _show(self):
         self.visible = True
         self._ns_window.makeKeyWindow()
-    
+
     def get_target(self):
         ns_window = self._ns_window
         ns_view = ns_window.firstResponder()
@@ -145,10 +150,10 @@ class Window(GWindow):
                 return component
             ns_view = ns_view.superview()
         return self
-    
+
     def center(self):
         self._ns_window.center()
-    
+
     def _stagger(self):
         key_win = application()._ns_key_window
         if key_win:
@@ -162,20 +167,38 @@ class Window(GWindow):
 
     def _document_needs_saving(self, state):
         self._ns_window.setDocumentEdited_(state)
-    
+
+    def modal_event_loop(self):
+        _ns_app = application()._ns_app
+
+        _ns_app.beginSheet_modalForWindow_modalDelegate_didEndSelector_contextInfo_(
+            self._ns_window,
+            self._parent_window._ns_window if self._parent_window else None,
+            None,
+            None,
+            None)
+
+        _ns_app.runModalForWindow_(self._ns_window)
+
+        _ns_app.endSheet_(self._ns_window)
+
+    def exit_modal_event_loop(self):
+        _ns_app = application()._ns_app
+
+        _ns_app.stopModal()
 #------------------------------------------------------------------------------
 
 class PyGUI_NSWindow(NSWindow, PyGUI_NS_EventHandler):
     #  pygui_component   Window
     #  resize_delta      point or None
-    
+
     __metaclass__ = NSMultiClass
-    __slots__ = ['pygui_component', 'resize_delta', 'pygui_field_editor']
-    
+    __slots__ = ['pygui_component', 'resize_delta', 'pygui_field_editor', 'before_fullscreen_bounds']
+
 #	pygui_component = None
 #	resize_delta = None
 #	pygui_field_editor = None
-    
+
     def _ns_event_position(self, ns_event):
         return ns_event.locationInWindow()
 
@@ -184,20 +207,61 @@ class PyGUI_NSWindow(NSWindow, PyGUI_NS_EventHandler):
         #  is pressed, and do the closing ourselves.
         self.pygui_component.close_cmd()
         return False
-    
+
     #  The NSWindow is made its own delegate.
 
+    def windowWillEnterFullScreen_(self, notification):
+        (l, y), (w, h) = self.contentRectForFrameRect_(
+            self.frame())
+        self.before_fullscreen_bounds = (w, h)
+
+    def windowDidEnterFullScreen_(self, notification):
+        b_frame = getattr(self, 'before_fullscreen_bounds', None)
+        if b_frame:
+            w0, h0 = b_frame
+            (l, y), (w1, h1) = self.contentRectForFrameRect_(
+                self.frame())
+            self.pygui_component._resized((w1 - w0, h1 - h0))
+            self.before_fullscreen_bounds = None
+
+    def windowWillExitFullScreen_(self, notification):
+        (l, y), (w, h) = self.contentRectForFrameRect_(
+            self.frame())
+        self.before_fullscreen_bounds = (w, h)
+
+    def windowDidExitFullScreen_(self, notification):
+        b_frame = getattr(self, 'before_fullscreen_bounds', None)
+        if b_frame:
+            w0, h0 = b_frame
+            (l, y), (w1, h1) = self.contentRectForFrameRect_(
+                self.frame())
+            self.pygui_component._resized((w1 - w0, h1 - h0))
+            self.before_fullscreen_bounds = None
+
     def windowWillResize_toSize_(self, ns_win, new_ns_size):
-        w0, h0 = self.frame().size
-        w1, h1 = new_ns_size
-        self.resize_delta = (w1 - w0, h1 - h0)
+        (l, t), (w0, h0) = self.contentRectForFrameRect_(
+                self.frame())
+        new_rect = ((l, t), new_ns_size)
+        (l, t), (w1, h1) = self.contentRectForFrameRect_(
+                new_rect)
+
+        self.resize_delta = (w0, h0)
+
         return new_ns_size
-    
+
     def windowDidResize_(self, notification):
         delta = getattr(self, 'resize_delta', None)
-        if delta:
-            self.pygui_component._resized(delta)
+        b_frame = getattr(self, 'before_fullscreen_bounds', None)
+        if delta and not b_frame:
+            (l, t), (w1, h1) = self.contentRectForFrameRect_(
+                self.frame())
+            w0, h0 = delta
+            self.pygui_component._resized((w1 - w0, h1 - h0))
             self.resize_delta = None
+
+    def windowShouldZoom_toFrame_(self, window, newFrame):
+        self.setFrame_display_(newFrame, False)
+        return True
 
     def windowDidBecomeKey_(self, notification):
         app = application()
@@ -208,7 +272,7 @@ class PyGUI_NSWindow(NSWindow, PyGUI_NS_EventHandler):
         app = application()
         app._ns_key_window = None
         app._update_menubar()
-    
+
     def windowWillReturnFieldEditor_toObject_(self, ns_window, ns_obj):
         #  Return special field editor for newline handling in text fields.
         #print "Window: Field editor requested for", object.__repr__(ns_obj) ###
@@ -224,17 +288,17 @@ class PyGUI_NSWindow(NSWindow, PyGUI_NS_EventHandler):
             editor.setDrawsBackground_(False)
             self.pygui_field_editor = editor
         return editor
-    
+
     #  Need the following two methods so that a fullscreen window can become
     #  the main window. Otherwise it can't, because it has no title bar.
 
     def canBecomeKeyWindow(self):
         return self.isVisible()
-    
+
     def canBecomeMainWindow(self):
         #print "PyGUI_NSWindow.canBecomeMainWindow"
         return self.isVisible()
-    
+
     def windowDidBecomeMain_(self, notification):
         #print "PyGUI_NSWindow.windowDidBecomeMain_:",  self.pygui_component.title ###
         comp = self.pygui_component
@@ -278,15 +342,15 @@ class PyGUI_FieldEditorBase(NSTextView):
 #------------------------------------------------------------------------------
 
 class PyGUI_FieldEditor(PyGUI_FieldEditorBase, PyGUI_NS_EventHandler):
-    
+
     __metaclass__ = NSMultiClass
-    
+
     def get_pygui_component(self):
         pygui_nstextfield = self.superview().superview()
         component = pygui_nstextfield.pygui_component
         component._ns_responder = self
         return component
-    
+
     pygui_component = property(get_pygui_component)
 
 export(Window)

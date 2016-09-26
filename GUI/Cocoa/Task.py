@@ -25,7 +25,7 @@ class TaskTrigger(object):
 
 def fire_(ns_timer):
     ns_timer_to_task[ns_timer]._ns_fire()
-    
+
 trigger = TaskTrigger()
 trigger.fire_ = fire_
 
@@ -40,17 +40,20 @@ class Task(GTask):
         self._ns_timer = None
         if start:
             self.start()
-    
+
     def destroy(self):
         #print "Task.destroy:", self ###
         self.stop()
-    
+
+    def __del__(self):
+        self.stop()
+
     def get_scheduled(self):
         return self._ns_timer is not None
-    
+
     def get_interval(self):
         return self._interval
-    
+
     def get_repeat(self):
         return self._repeat
 
@@ -71,19 +74,21 @@ class Task(GTask):
             ns_timer, NSEventTrackingRunLoopMode)
         ns_run_loop.addTimer_forMode_(
             ns_timer, NSModalPanelRunLoopMode)
-    
+
     def stop(self):
         ns_timer = self._ns_timer
         if ns_timer:
             ns_timer.invalidate()
             del ns_timer_to_task[ns_timer]
             self._ns_timer = None
-    
+
     def _ns_fire(self):
         try:
             self._proc()
         except:
             Globals.pending_exception = sys.exc_info()
+            import logging
+            logging.exception('pygui task error')
             self.stop()
 
 export(Task)

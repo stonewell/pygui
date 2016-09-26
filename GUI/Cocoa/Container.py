@@ -9,10 +9,10 @@ from GUI.GContainers import Container as GContainer
 
 class Container(GContainer):
     #  _ns_inner_view   NSView   Containing NSView for subcomponents
-    
+
 #	def __init__(self, _ns_view, **kwds):
 #		GContainer.__init__(self, _ns_view = _ns_view, **kwds)
-    
+
 #	def destroy(self):
 #		#print "Container.destroy:", self ###
 #		GContainer.destroy(self)

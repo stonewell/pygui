@@ -10,12 +10,12 @@ class RadioGroup(Properties, Action):
     It has a 'value' property which is equal to the value
     of the currently selected RadioButton. It may be given
     an action procedure to execute when its value changes.
-    
+
     Operations:
         iter(group)
             Returns an iterator over the items of the group.
     """
-    
+
     value = overridable_property('value', """The value of the currently
         selected radio button.""")
 
@@ -26,11 +26,11 @@ class RadioGroup(Properties, Action):
         Properties.__init__(self, **kwds)
         self._items = []
         self.add_items(items)
-    
+
     #
     #   Operations
     #
-    
+
     def __iter__(self):
         return iter(self._items)
 
@@ -46,7 +46,7 @@ class RadioGroup(Properties, Action):
             self._value = x
             self._value_changed()
             self.do_action()
-    
+
     #
     #		Adding and removing items
     #
@@ -55,7 +55,7 @@ class RadioGroup(Properties, Action):
         "Add a sequence of RadioButtons to this group."
         for item in items:
             self.add_item(item)
-    
+
     def add_item(self, item):
         "Add a RadioButton to this group."
         item.group = self
@@ -64,7 +64,7 @@ class RadioGroup(Properties, Action):
         "Remove a sequence of RadioButtons from this group."
         for item in items:
             item.group = None
-    
+
     def remove_item(self, item):
         "Remove a RadioButton from this group."
         item.group = None
@@ -72,11 +72,11 @@ class RadioGroup(Properties, Action):
     def _add_item(self, item):
         self._items.append(item)
         self._item_added(item)
-    
+
     def _remove_item(self, item):
         self._items.remove(item)
         self._item_removed(item)
-    
+
     def _item_added(self, item):
         raise NotImplementedError
 
