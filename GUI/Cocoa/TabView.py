@@ -26,7 +26,7 @@ class TabView(GTabView):
         ns_tabview.pygui_component = self
         ns_tabview.setFont_(font._ns_font)
         ns_tabview.setDelegate_(self)
-        
+
         return ns_tabview
 
     def __init__(self, font = system_font, **kwds):
@@ -37,25 +37,28 @@ class TabView(GTabView):
         _ns_tabview = self._ns_view
 
         count = _ns_tabview.numberOfTabViewItems()
-        
+
         _ns_tabview_item = NSTabViewItem.alloc().initWithIdentifier_('item_count_%d' % count)
         _ns_tabview_item.set_view_(v._ns_view)
         _ns_tabview_item.set_label_(title if title is not None else 'item %d' % (count + 1))
 
         return _ns_tabview_item
-        
+
     def add_item(self, v, title = None):
-        GTabView.add_item(self, v, title)
-        
         _ns_tabview = self._ns_view
 
         _ns_tabview_item = self._create_ns_tabview_item(v, title)
-        
+
+        GTabView.add_item(self, v, title)
+
         _ns_tabview.addTabViewItem_(_ns_tabview_item)
+
+        child_bounds = self._get_content_bounds()
+        v.bounds = child_bounds
 
     def remove_item(self, v):
         GTabView.remove_item(self, v)
-        
+
         _ns_tabview = self._ns_view
         for item in _ns_tabview.tabViewItems():
             if item.view() == v._ns_view:
@@ -64,11 +67,11 @@ class TabView(GTabView):
 
     def insert_item_at(self, v, i, title = None):
         GTabView.insert_item_at(self, v, i, title)
-        
+
         _ns_tabview = self._ns_view
 
         _ns_tabview_item = self._create_ns_tabview_item(v, title)
-        
+
         _ns_tabview.insertTabViewItem_atIndex_(_ns_tabview_item, i)
 
     def remove_item_at(self, i):
@@ -85,7 +88,7 @@ class TabView(GTabView):
 
     def tabView_didSelectTabViewItem_(self, tabview, item):
         self.tab_changed(tabview.indexOfTabViewItem_(item))
-        
+
     def get_selected_index(self):
         _ns_tabview = self._ns_view
 
@@ -103,7 +106,22 @@ class TabView(GTabView):
             _nstabview.selectTabViewItem_(None)
         else:
             _ns_tabview.selectTabViewItemAtIndex_(index)
-        
+
+    def _get_content_bounds(self):
+        _ns_tabview = self._ns_view
+        (l, t), (w, h) = _ns_tabview.contentRect()
+
+        child_bounds = (l, t, l + w, t + h)
+
+        return child_bounds
+
+    def resized(self, delta):
+        _ns_tabview = self._ns_view
+        child_bounds = self._get_content_bounds()
+
+        for c in self._contents:
+            c.bounds = child_bounds
+
 #------------------------------------------------------------------------------
 
 class PyGUI_NSTabView(NSTabView, PyGUI_NS_EventHandler):
