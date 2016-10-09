@@ -3,6 +3,8 @@
 #
 
 import sys
+import logging
+
 from weakref import WeakValueDictionary
 from Foundation import NSTimer, NSRunLoop, NSDefaultRunLoopMode
 from AppKit import NSEventTrackingRunLoopMode, NSModalPanelRunLoopMode
@@ -58,22 +60,25 @@ class Task(GTask):
         return self._repeat
 
     def start(self):
-        self.stop()
-        #ns_timer = \
-        #	NSTimer.timerWithTimeInterval_target_selector_userInfo_repeats_(
-        #		self._interval, self._target, '_ns_fire', None, self._repeat)
-        ns_timer = \
-            NSTimer.timerWithTimeInterval_target_selector_userInfo_repeats_(
-                self._interval, trigger, 'fire:', None, self._repeat)
-        self._ns_timer = ns_timer
-        ns_timer_to_task[ns_timer] = self
-        ns_run_loop = NSRunLoop.currentRunLoop()
-        ns_run_loop.addTimer_forMode_(
-            ns_timer, NSDefaultRunLoopMode)
-        ns_run_loop.addTimer_forMode_(
-            ns_timer, NSEventTrackingRunLoopMode)
-        ns_run_loop.addTimer_forMode_(
-            ns_timer, NSModalPanelRunLoopMode)
+        try:
+            self.stop()
+            #ns_timer = \
+            #	NSTimer.timerWithTimeInterval_target_selector_userInfo_repeats_(
+            #		self._interval, self._target, '_ns_fire', None, self._repeat)
+            ns_timer = \
+              NSTimer.timerWithTimeInterval_target_selector_userInfo_repeats_(
+                  self._interval, trigger, 'fire:', None, self._repeat)
+            self._ns_timer = ns_timer
+            ns_timer_to_task[ns_timer] = self
+            ns_run_loop = NSRunLoop.mainRunLoop()
+            ns_run_loop.addTimer_forMode_(
+                ns_timer, NSDefaultRunLoopMode)
+            ns_run_loop.addTimer_forMode_(
+                ns_timer, NSEventTrackingRunLoopMode)
+            ns_run_loop.addTimer_forMode_(
+                ns_timer, NSModalPanelRunLoopMode)
+        except:
+            logging.exception('pygui task start error')
 
     def stop(self):
         ns_timer = self._ns_timer
@@ -87,7 +92,6 @@ class Task(GTask):
             self._proc()
         except:
             Globals.pending_exception = sys.exc_info()
-            import logging
             logging.exception('pygui task error')
             self.stop()
 

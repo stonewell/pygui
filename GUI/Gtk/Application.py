@@ -23,7 +23,7 @@ class Application(GApplication):
         GApplication.set_menus(self, menu_list)
         for window in self._windows:
             window._gtk_update_menubar()
-    
+
 #	def handle_events(self):
 #		#print "Application.handle_events: entering gtk.main" ###
 #		_call_with_excepthook(gtk.main, gtk.main_quit)
@@ -32,11 +32,11 @@ class Application(GApplication):
     def handle_next_event(self, modal_window = None):
         _call_with_excepthook(gtk.main_iteration)
         self._check_for_no_windows()
-    
+
 #	def _quit(self):
 #		self._quit_flag = True
 #		gtk.main_quit()
-    
+
 #	def _exit_event_loop(self):
 #		gtk.main_quit()
 
@@ -48,22 +48,16 @@ class Application(GApplication):
 
     def zero_windows_allowed(self):
         return 0
-    
+
     def query_clipboard(self):
         return _gtk_clipboard.available()
-    
+
     def get_clipboard(self):
         return _gtk_clipboard.get()
-    
+
     def set_clipboard(self, data):
         _gtk_clipboard.set(data)
-        
-    def schedule_idle(self, callback, *args):
-        gobject.idle_add(callback, *args)
 
-    def schedule_timeout(self, interval, callback, *args):
-        gobject.timeout_add(interval, callback, *args)
-        
 #------------------------------------------------------------------------------
 
 class GtkClipboard(gtk.Window):
@@ -80,7 +74,7 @@ class GtkClipboard(gtk.Window):
     def selection_get_signalled(self, w, selection_data, info, time_stamp):
         #print "Clipboard.selection_get_signalled" ###
         selection_data.set_text(self.data, len(self.data))
-    
+
     def selection_received_signalled(self, w, selection_data, info):
         #print "Clipboard.selection_received_signalled:", selection_data ###
         type = str(selection_data.type)
@@ -93,7 +87,7 @@ class GtkClipboard(gtk.Window):
             data = None
         #print "...data =", repr(data) ###
         self.received_data = data
-    
+
     def request(self, target, default):
         #  Get the contents of the clipboard.
         #print "Clipboard.request:", target ###
@@ -107,7 +101,7 @@ class GtkClipboard(gtk.Window):
             data = default
         #print "Clipboard.request ->", repr(data) ###
         return data
-    
+
     def available(self):
         targets = self.request("TARGETS", ())
         #print "Clipboard.available: targets =", repr(targets) ###
@@ -118,7 +112,7 @@ class GtkClipboard(gtk.Window):
         text = self.request("STRING", "")
         #print "Clipboard.get ->", repr(text) ###
         return text
-        
+
     def set(self, text):
         #  Put the given text on the clipboard.
         #print "Clipboard.set:", text ###
