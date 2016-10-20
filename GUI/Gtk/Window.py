@@ -152,8 +152,20 @@ class Window(GWindow):
         return target or self
 
     def _screen_rect(self):
-        w = gdk.screen_width()
-        h = gdk.screen_height()
+        gtk_win = self._gtk_outer_widget
+        s = gtk_win.get_screen()
+        # Using the screen of the Window, the monitor it's on can be identified
+        gdk_win = s.get_active_window() if s.get_active_window() else gtk_win.get_root_window()
+
+        if gdk_win:
+            m = s.get_monitor_at_window(gdk_win)
+            # Then get the geometry of that monitor
+            monitor = s.get_monitor_geometry(m)
+            w = monitor.width
+            h = monitor.height
+        else:
+            w = gdk.screen_width()
+            h = gdk.screen_height()
         return (0, 0, w, h)
     
     def _gtk_menubar_height(self):
