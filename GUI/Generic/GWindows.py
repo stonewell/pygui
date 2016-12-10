@@ -109,7 +109,6 @@ class Window(Container):
 
     def center(self):
         """Position the window in the centre of the screen."""
-        print "GWindow.center" ###
         sl, st, sr, sb = self._screen_rect()
         w, h = self.size
         l = (sr - sl - w) // 2
