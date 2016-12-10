@@ -52,9 +52,9 @@ class TabView(GTabView):
         
         lbuf = gui.PyMakeBuffer(len(title)+1)
         address,l = gui.PyGetBufferAddressAndLen(lbuf)
-        gui.PySetString(address, title)
-        
-        _format = "iiiiiii"
+        gui.PySetMemory(address, title)
+
+        _format = "iiiPiii"
         buf = struct.pack(_format,
             cc.TCIF_TEXT, # mask
             0, # state
@@ -62,7 +62,7 @@ class TabView(GTabView):
             address,
             0, #unused
             0, #image
-            0 #data
+            i #data
             )
         
         gui.SendMessage(_tab_ctrl.GetSafeHwnd(),
