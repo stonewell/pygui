@@ -26,7 +26,8 @@ class TaskTrigger(object):
     pass
 
 def fire_(ns_timer):
-    ns_timer_to_task[ns_timer]._ns_fire()
+    if ns_timer in ns_timer_to_task:
+        ns_timer_to_task[ns_timer]._ns_fire()
 
 trigger = TaskTrigger()
 trigger.fire_ = fire_
