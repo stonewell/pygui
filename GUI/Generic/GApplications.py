@@ -431,6 +431,8 @@ class Application(Properties, MessageHandler):
         giving the options Continue, Traceback or Abort. Traceback displays
         a traceback and continues; Abort raises SystemExit."""
         try:
+            import logging
+            logging.exception("Sorry, something went wrong")
             exc_type, exc_val, exc_tb = sys.exc_info()
             exc_desc = "%s: %s" % (exc_type.__name__, exc_val)
             self.print_traceback(exc_desc, exc_tb)
