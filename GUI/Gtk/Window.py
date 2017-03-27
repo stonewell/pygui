@@ -115,10 +115,12 @@ class Window(GWindow):
         self._position = gtk_win.get_position()
         #self._update_size(gtk_win.get_size())
         w, h = gtk_win.get_size()
+
         #w, h = self._gtk_inner_widget.get_size()
         #w, h = self._gtk_inner_widget.size_request()
         old_size = self._size
         new_size = (w, h - self._gtk_menubar_height())
+
         #new_size = (w, h)
         #print "Window._gtk_configure_event:", old_size, "->", new_size ###
         self._size = new_size
@@ -254,6 +256,21 @@ class Window(GWindow):
 
     def dispatch(self, message, *args):
         self.target.handle(message, *args)
+
+    #Window size is inner wiget size, which exclude menu bar
+    def _gtk_size_allocate(self, allocation, *largs):
+        x, y, w, h = allocation
+
+        x0, y0 = self.position
+        w0, h0 = self.size
+        h0 += self._gtk_menubar_height()
+
+        if x0 != x or y0 != y:
+            self._position = (x, y)
+
+        if w0 != w or h0 != h:
+            self._size = (w, h - self._gtk_menubar_height())
+            self._resized((w - w0, h - h0))
 
 
 _gtk_menubar_height = None

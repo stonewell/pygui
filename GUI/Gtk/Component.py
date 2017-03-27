@@ -151,7 +151,7 @@ class Component(GComponent):
                 handler(*args)
             except:
                 _gtk_exception_in_signal_handler()
-        gtk_widget.connect(signal, lambda widget, *args: handler(*args))
+        gtk_widget.connect(signal, catch)
 
     def _gtk_connect_after(self, gtk_widget, signal, handler):
         def catch(widget, *args):
@@ -159,7 +159,7 @@ class Component(GComponent):
                 handler(*args)
             except:
                 _gtk_exception_in_signal_handler()
-        gtk_widget.connect_after(signal, lambda widget, *args: handler(*args))
+        gtk_widget.connect_after(signal, catch)
 
     def _gtk_focus_in(self, gtk_event):
         window = self.window
@@ -262,7 +262,11 @@ class Component(GComponent):
 #------------------------------------------------------------------------------
 
 def _gtk_exception_in_signal_handler():
+    import sys
+    import traceback
+    import logging
     print >>sys.stderr, "---------- Exception in gtk signal handler ----------"
     traceback.print_exc()
+    logging.exception("Exception in gtk signal handler")
 
 export(Component)

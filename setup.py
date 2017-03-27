@@ -68,7 +68,18 @@ plat = sys.platform
 if plat.startswith("darwin"):
     platdir = "Cocoa"
 elif plat.startswith("linux"):
-    platdir = "Gtk"
+    try:
+        import gtk
+        platdir = "Gtk"
+    except:
+        try:
+            import gi.repository.Gtk
+            platdir = "GtkGI"
+        except:
+            sys.stderr.write(
+                "Don't know which backend to install for platform '%s', no gtk or gi found.\n"
+                % plat)
+            sys.exit(1)
 elif plat.startswith("win"):
     platdir = "Win32"
 else:
