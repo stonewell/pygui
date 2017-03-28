@@ -148,7 +148,7 @@ class Component(GComponent):
     def _gtk_connect(self, gtk_widget, signal, handler):
         def catch(widget, *args):
             try:
-                handler(*args)
+                return handler(*args)
             except:
                 _gtk_exception_in_signal_handler()
         gtk_widget.connect(signal, catch)
@@ -156,7 +156,7 @@ class Component(GComponent):
     def _gtk_connect_after(self, gtk_widget, signal, handler):
         def catch(widget, *args):
             try:
-                handler(*args)
+                return handler(*args)
             except:
                 _gtk_exception_in_signal_handler()
         gtk_widget.connect_after(signal, catch)
