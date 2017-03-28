@@ -13,8 +13,8 @@ import sys, types
 _versions = [
     ("objc", "Cocoa"),
     ("nt", "Win32"),
-    ("gi.repository.Gtk", "GtkGI"),
     ("gtk", "Gtk"),
+    ("gi.repository.Gtk", "GtkGI"),
 ]
 
 #  
