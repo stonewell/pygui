@@ -70,6 +70,7 @@ class GtkClipboard(gtk.Window):
         self.connect('selection_get', self.selection_get_signalled)
         self.connect('selection_received', self.selection_received_signalled)
         self.selection_add_target("CLIPBOARD", "STRING", 0)
+        self.selection_add_target("CLIPBOARD", "UTF8_STRING", 3)
 
     def selection_get_signalled(self, w, selection_data, info, time_stamp):
         #print "Clipboard.selection_get_signalled" ###
@@ -79,6 +80,8 @@ class GtkClipboard(gtk.Window):
         #print "Clipboard.selection_received_signalled:", selection_data ###
         type = str(selection_data.type)
         if type == "STRING":
+            data = selection_data.get_text()
+        elif type == "UTF8_STRING":
             data = selection_data.get_text()
         elif type == "ATOM":
             data = selection_data.get_targets()
@@ -105,12 +108,14 @@ class GtkClipboard(gtk.Window):
     def available(self):
         targets = self.request("TARGETS", ())
         #print "Clipboard.available: targets =", repr(targets) ###
-        return "STRING" in map(str, targets)
+        return "STRING" in map(str, targets) or "UTF8_STRING" in map(str, targets)
 
     def get(self):
         #  Get the contents of the clipboard.
-        text = self.request("STRING", "")
+        text = self.request("UTF8_STRING", "")
         #print "Clipboard.get ->", repr(text) ###
+        if len(text) == 0:
+            text = self.request("STRING", "")
         return text
 
     def set(self, text):
